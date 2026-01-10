@@ -1,0 +1,2404 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KEQAS hs-TnI 대시보드</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Malgun Gothic', '맑은 고딕', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .container {
+            text-align: center;
+            background: white;
+            padding: 50px;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            max-width: 600px;
+        }
+        h1 { 
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 28px;
+        }
+        p { 
+            color: #666;
+            font-size: 16px;
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+        .button-group {
+            margin-top: 30px;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        a {
+            display: inline-block;
+            padding: 12px 24px;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: background 0.3s ease;
+        }
+        a:hover {
+            background: #764ba2;
+        }
+        .info-box {
+            background: #e7f3ff;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin: 20px 0;
+            text-align: left;
+            border-radius: 5px;
+        }
+        .info-box strong {
+            color: #667eea;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📋 KEQAS hs-TnI 기관별 보고서</h1>
+        <p>2025년 2회차 심장표지자단백검사 외부정도관리</p>
+        
+        <div class="info-box">
+            <strong>📊 총 194개 기관</strong><br>
+            기준분류 6개 / 검체 3개 (CCA-25-04, 05, 06)
+        </div>
+        
+        <div class="button-group">
+            <a href="KEQAS_hs_TnI_Dashboard.html">📊 대시보드 열기</a>
+            <a href="https://github.com/yun7640/Cardiac_Marker">📁 GitHub 저장소</a>
+        </div>
+        
+        <p style="margin-top: 30px; font-size: 13px; color: #999;">
+            이 페이지는 GitHub Pages를 통해 배포됩니다.
+        </p>
+    </div>
+</body>
+</html>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Malgun Gothic', '맑은 고딕', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 20px;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .filter-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .filter-section label {
+            font-weight: bold;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .filter-section select {
+            padding: 10px 15px;
+            border: 2px solid #667eea;
+            border-radius: 5px;
+            font-size: 14px;
+            font-family: 'Malgun Gothic', '맑은 고딕', sans-serif;
+            cursor: pointer;
+            background: white;
+        }
+        
+        .filter-section select:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .info-section {
+            background: #e7f3ff;
+            padding: 15px;
+            border-left: 4px solid #667eea;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            color: #333;
+        }
+        
+        .info-section strong {
+            color: #667eea;
+        }
+        
+        .institutions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+        
+        .institution-card {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .institution-card:hover {
+            border-color: #667eea;
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.2);
+            transform: translateY(-2px);
+        }
+        
+        .institution-card.hidden {
+            display: none;
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        
+        .card-code {
+            font-weight: bold;
+            font-size: 16px;
+            color: #667eea;
+        }
+        
+        .card-ref-class {
+            background: #667eea;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .card-info {
+            font-size: 13px;
+            color: #666;
+            line-height: 1.8;
+        }
+        
+        .card-info-label {
+            font-weight: bold;
+            color: #333;
+            display: inline-block;
+            width: 80px;
+        }
+        
+        .card-button {
+            margin-top: 15px;
+            width: 100%;
+            padding: 10px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            font-family: 'Malgun Gothic', '맑은 고딕', sans-serif;
+            transition: background 0.3s ease;
+        }
+        
+        .card-button.disabled {
+            background: #cccccc;
+            color: #666;
+            cursor: not-allowed;
+        }
+        
+        .card-button:hover {
+            background: #764ba2;
+        }
+        
+        .stats {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 24px;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        .no-results {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+        
+        .footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+            text-align: center;
+            color: #999;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏥 KEQAS 2025-2 심장표지자단백검사(hs-TnI)</h1>
+            <p>기관별 보고서 조회 대시보드</p>
+        </div>
+        
+        <div class="filter-section">
+            <label for="refClassFilter">
+                🔍 기준분류 선택:
+            </label>
+            <select id="refClassFilter">
+                <option value="">전체 보기</option>
+            </select>
+            <button onclick="resetFilter()" style="padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 5px; cursor: pointer; font-family: 'Malgun Gothic', '맑은 고딕', sans-serif;">초기화</button>
+        </div>
+        
+        <div class="info-section" id="infoSection">
+            <strong>📊 전체 기관:</strong> <span id="totalCount">0</span>개 | 
+            <strong>✓ 표시된 기관:</strong> <span id="displayCount">0</span>개
+        </div>
+        
+        <div class="institutions-grid" id="institutionsGrid">
+        </div>
+        
+        <div class="stats">
+            <div class="stat-item">
+                <div class="stat-number" id="statTotal">0</div>
+                <div class="stat-label">총 기관 수</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" id="statRefClass">0</div>
+                <div class="stat-label">기준분류 수</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" id="statSpecimens">3</div>
+                <div class="stat-label">검체 수</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" id="statYear">2025</div>
+                <div class="stat-label">프로그램 년도</div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>KEQAS (외부정도관리) 기관별 보고서 - 각 기관의 개별 보고서를 확인하려면 기관 카드의 "보고서 보기" 버튼을 클릭하세요.</p>
+        </div>
+    </div>
+    
+    <script>
+        // 데이터 로드
+        const institutions = [
+  {
+    "code": "LAB_001",
+    "ref_class": "Siemens Healthineers",
+    "device_company": "Siemens Healthineers",
+    "device_name": "Atellica IM 1600 Analyzer",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": true,
+    "report_url": "reports/institution_reports/LAB_001.html"
+  },
+  {
+    "code": "LAB_002",
+    "ref_class": "Abbott",
+    "device_company": "Abbott",
+    "device_name": "Alinity I",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": true,
+    "report_url": "reports/institution_reports/LAB_002.html"
+  },
+  {
+    "code": "LAB_003",
+    "ref_class": "Abbott",
+    "device_company": "Abbott",
+    "device_name": "Alinity I",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": true,
+    "report_url": "reports/institution_reports/LAB_003.html"
+  },
+  {
+    "code": "LAB_004",
+    "ref_class": "Siemens Healthineers",
+    "device_company": "Siemens Healthineers",
+    "device_name": "Atellica IM 1600 Analyzer",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": true,
+    "report_url": "reports/institution_reports/LAB_004.html"
+  },
+  {
+    "code": "LAB_005",
+    "ref_class": "Abbott",
+    "device_company": "Abbott",
+    "device_name": "Alinity I",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": true,
+    "report_url": "reports/institution_reports/LAB_005.html"
+  },
+  {
+    "code": "LAB_006",
+    "ref_class": "Abbott",
+    "device_company": "Abbott",
+    "device_name": "Alinity I",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_006.html"
+  },
+  {
+    "code": "LAB_007",
+    "ref_class": "Beckman Coulter Inc.",
+    "device_company": "Beckman Coulter Inc.",
+    "device_name": "UniCel DxI800",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_007.html"
+  },
+  {
+    "code": "LAB_008",
+    "ref_class": "Abbott",
+    "device_company": "Abbott",
+    "device_name": "Alinity I",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_008.html"
+  },
+  {
+    "code": "LAB_009",
+    "ref_class": "Beckman Coulter Inc.",
+    "device_company": "Beckman Coulter Inc.",
+    "device_name": "UniCel DxI800",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_009.html"
+  },
+  {
+    "code": "LAB_010",
+    "ref_class": "Siemens Healthineers",
+    "device_company": "Siemens Healthineers",
+    "device_name": "Atellica IM 1600 Analyzer",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_010.html"
+  },
+  {
+    "code": "LAB_011",
+    "ref_class": "Beckman Coulter Inc.",
+    "device_company": "Beckman Coulter Inc.",
+    "device_name": "UniCel DxI800",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_011.html"
+  },
+  {
+    "code": "LAB_012",
+    "ref_class": "Siemens Healthineers",
+    "device_company": "Siemens Healthineers",
+    "device_name": "Atellica IM 1600 Analyzer",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_012.html"
+  },
+  {
+    "code": "LAB_013",
+    "ref_class": "Abbott",
+    "device_company": "Abbott",
+    "device_name": "Alinity I",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_013.html"
+  },
+  {
+    "code": "LAB_014",
+    "ref_class": "Abbott",
+    "device_company": "Abbott",
+    "device_name": "Alinity I",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_014.html"
+  },
+  {
+    "code": "LAB_015",
+    "ref_class": "Beckman Coulter Inc.",
+    "device_company": "Beckman Coulter Inc.",
+    "device_name": "UniCel DxI800",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_015.html"
+  },
+  {
+    "code": "LAB_016",
+    "ref_class": "Abbott",
+    "device_company": "Abbott",
+    "device_name": "ARCHITECT i2000",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_016.html"
+  },
+  {
+    "code": "LAB_017",
+    "ref_class": "Siemens Healthineers",
+    "device_company": "Siemens Healthineers",
+    "device_name": "Atellica IM 1600 Analyzer",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_017.html"
+  },
+  {
+    "code": "LAB_018",
+    "ref_class": "Siemens Healthineers",
+    "device_company": "Siemens Healthineers",
+    "device_name": "Atellica IM 1600 Analyzer",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_018.html"
+  },
+  {
+    "code": "LAB_019",
+    "ref_class": "Beckman Coulter Inc.",
+    "device_company": "Beckman Coulter Inc.",
+    "device_name": "UniCel DxI800",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_019.html"
+  },
+  {
+    "code": "LAB_020",
+    "ref_class": "Siemens Healthineers",
+    "device_company": "Siemens Healthineers",
+    "device_name": "Atellica IM 1600 Analyzer",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_020.html"
+  },
+  {
+    "code": "LAB_021",
+    "ref_class": "Siemens Healthineers",
+    "device_company": "Siemens Healthineers",
+    "device_name": "Atellica IM 1600 Analyzer",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_021.html"
+  },
+  {
+    "code": "LAB_022",
+    "ref_class": "Siemens Healthineers",
+    "device_company": "Siemens Healthineers",
+    "device_name": "Atellica IM 1600 Analyzer",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_022.html"
+  },
+  {
+    "code": "LAB_023",
+    "ref_class": "Abbott",
+    "device_company": "Abbott",
+    "device_name": "Alinity I",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_023.html"
+  },
+  {
+    "code": "LAB_024",
+    "ref_class": "Abbott",
+    "device_company": "Abbott",
+    "device_name": "Alinity I",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_024.html"
+  },
+  {
+    "code": "LAB_025",
+    "ref_class": "Beckman Coulter Inc.",
+    "device_company": "Beckman Coulter Inc.",
+    "device_name": "UniCel DxI800",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_025.html"
+  },
+  {
+    "code": "LAB_026",
+    "ref_class": "Abbott",
+    "device_company": "Abbott",
+    "device_name": "Alinity I",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_026.html"
+  },
+  {
+    "code": "LAB_027",
+    "ref_class": "Abbott",
+    "device_company": "Abbott",
+    "device_name": "ARCHITECT i2000",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_027.html"
+  },
+  {
+    "code": "LAB_028",
+    "ref_class": "Beckman Coulter Inc.",
+    "device_company": "Beckman Coulter Inc.",
+    "device_name": "UniCel DxI800",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_028.html"
+  },
+  {
+    "code": "LAB_029",
+    "ref_class": "Beckman Coulter Inc.",
+    "device_company": "Beckman Coulter Inc.",
+    "device_name": "UniCel DxI800",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_029.html"
+  },
+  {
+    "code": "LAB_030",
+    "ref_class": "Abbott",
+    "device_company": "Abbott",
+    "device_name": "ARCHITECT i2000",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_030.html"
+  },
+  {
+    "code": "LAB_031",
+    "ref_class": "Abbott",
+    "device_company": "Abbott",
+    "device_name": "Alinity I",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_031.html"
+  },
+  {
+    "code": "LAB_032",
+    "ref_class": "Abbott",
+    "device_company": "Abbott",
+    "device_name": "Alinity I",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_032.html"
+  },
+  {
+    "code": "LAB_033",
+    "ref_class": "Siemens Healthineers",
+    "device_company": "Siemens Healthineers",
+    "device_name": "Atellica IM 1600 Analyzer",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_033.html"
+  },
+  {
+    "code": "LAB_034",
+    "ref_class": "Beckman Coulter Inc.",
+    "device_company": "Beckman Coulter Inc.",
+    "device_name": "UniCel DxI800",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_034.html"
+  },
+  {
+    "code": "LAB_035",
+    "ref_class": "Beckman Coulter Inc.",
+    "device_company": "Beckman Coulter Inc.",
+    "device_name": "UniCel DxI800",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_035.html"
+  },
+  {
+    "code": "LAB_036",
+    "ref_class": "Abbott",
+    "device_company": "Abbott",
+    "device_name": "Alinity I",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_036.html"
+  },
+  {
+    "code": "LAB_037",
+    "ref_class": "Abbott",
+    "device_company": "Abbott",
+    "device_name": "Alinity I",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_037.html"
+  },
+  {
+    "code": "LAB_038",
+    "ref_class": "Siemens Healthineers",
+    "device_company": "Siemens Healthineers",
+    "device_name": "Atellica IM 1600 Analyzer",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_038.html"
+  },
+  {
+    "code": "LAB_039",
+    "ref_class": "Abbott",
+    "device_company": "Abbott",
+    "device_name": "Alinity I",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_039.html"
+  },
+  {
+    "code": "LAB_040",
+    "ref_class": "Abbott",
+    "device_company": "Abbott",
+    "device_name": "Alinity I",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_040.html"
+  },
+  {
+    "code": "LAB_041",
+    "ref_class": "Abbott",
+    "device_company": "Abbott",
+    "device_name": "ARCHITECT i2000",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_041.html"
+  },
+  {
+    "code": "LAB_042",
+    "ref_class": "Siemens Healthineers",
+    "device_company": "Siemens Healthineers",
+    "device_name": "Atellica IM 1600 Analyzer",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_042.html"
+  },
+  {
+    "code": "LAB_043",
+    "ref_class": "Abbott",
+    "device_company": "Abbott",
+    "device_name": "Alinity I",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_043.html"
+  },
+  {
+    "code": "LAB_044",
+    "ref_class": "Abbott",
+    "device_company": "Abbott",
+    "device_name": "Alinity I",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_044.html"
+  },
+  {
+    "code": "LAB_045",
+    "ref_class": "Abbott",
+    "device_company": "Abbott",
+    "device_name": "Alinity I",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_045.html"
+  },
+  {
+    "code": "LAB_046",
+    "ref_class": "Siemens Healthineers",
+    "device_company": "Siemens Healthineers",
+    "device_name": "ADVIA Centaur® XPT Immunoassay System",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_046.html"
+  },
+  {
+    "code": "LAB_047",
+    "ref_class": "Abbott",
+    "device_company": "Abbott",
+    "device_name": "ARCHITECT i2000",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_047.html"
+  },
+  {
+    "code": "LAB_048",
+    "ref_class": "Abbott",
+    "device_company": "Abbott",
+    "device_name": "Alinity I",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_048.html"
+  },
+  {
+    "code": "LAB_049",
+    "ref_class": "Siemens Healthineers",
+    "device_company": "Siemens Healthineers",
+    "device_name": "Atellica IM 1300 Analyzer",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_049.html"
+  },
+  {
+    "code": "LAB_050",
+    "ref_class": "Siemens Healthineers",
+    "device_company": "Siemens Healthineers",
+    "device_name": "Atellica IM 1600 Analyzer",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_050.html"
+  },
+  {
+    "code": "LAB_051",
+    "ref_class": "Siemens Healthineers",
+    "device_company": "Siemens Healthineers",
+    "device_name": "Atellica IM 1300 Analyzer",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_051.html"
+  },
+  {
+    "code": "LAB_052",
+    "ref_class": "Abbott",
+    "device_company": "Abbott",
+    "device_name": "ARCHITECT i2000",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_052.html"
+  },
+  {
+    "code": "LAB_053",
+    "ref_class": "Beckman Coulter Inc.",
+    "device_company": "Beckman Coulter Inc.",
+    "device_name": "UniCel DxI800",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_053.html"
+  },
+  {
+    "code": "LAB_054",
+    "ref_class": "Siemens Healthineers",
+    "device_company": "Siemens Healthineers",
+    "device_name": "Atellica IM 1600 Analyzer",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_054.html"
+  },
+  {
+    "code": "LAB_055",
+    "ref_class": "Siemens Healthineers",
+    "device_company": "Siemens Healthineers",
+    "device_name": "Atellica IM 1600 Analyzer",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_055.html"
+  },
+  {
+    "code": "LAB_056",
+    "ref_class": "Beckman Coulter Inc.",
+    "device_company": "Beckman Coulter Inc.",
+    "device_name": "UniCel DxI800",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_056.html"
+  },
+  {
+    "code": "LAB_057",
+    "ref_class": "Siemens Healthineers",
+    "device_company": "Siemens Healthineers",
+    "device_name": "Atellica IM 1300 Analyzer",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_057.html"
+  },
+  {
+    "code": "LAB_058",
+    "ref_class": "Abbott",
+    "device_company": "Abbott",
+    "device_name": "ARCHITECT i2000",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_058.html"
+  },
+  {
+    "code": "LAB_059",
+    "ref_class": "Siemens Healthineers",
+    "device_company": "Siemens Healthineers",
+    "device_name": "Atellica IM 1600 Analyzer",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_059.html"
+  },
+  {
+    "code": "LAB_060",
+    "ref_class": "Abbott",
+    "device_company": "Abbott",
+    "device_name": "ARCHITECT i2000",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_060.html"
+  },
+  {
+    "code": "LAB_061",
+    "ref_class": "Beckman Coulter Inc.",
+    "device_company": "Beckman Coulter Inc.",
+    "device_name": "UniCel DxI800",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_061.html"
+  },
+  {
+    "code": "LAB_062",
+    "ref_class": "Abbott",
+    "device_company": "Abbott",
+    "device_name": "Alinity I",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_062.html"
+  },
+  {
+    "code": "LAB_063",
+    "ref_class": "Abbott",
+    "device_company": "Abbott",
+    "device_name": "Alinity I",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_063.html"
+  },
+  {
+    "code": "LAB_064",
+    "ref_class": "Abbott",
+    "device_company": "Abbott",
+    "device_name": "Alinity I",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_064.html"
+  },
+  {
+    "code": "LAB_065",
+    "ref_class": "Siemens Healthineers",
+    "device_company": "Siemens Healthineers",
+    "device_name": "Atellica IM 1300 Analyzer",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_065.html"
+  },
+  {
+    "code": "LAB_066",
+    "ref_class": "Beckman Coulter Inc.",
+    "device_company": "Beckman Coulter Inc.",
+    "device_name": "Access2",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_066.html"
+  },
+  {
+    "code": "LAB_067",
+    "ref_class": "Siemens Healthineers",
+    "device_company": "Siemens Healthineers",
+    "device_name": "Atellica IM 1600 Analyzer",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_067.html"
+  },
+  {
+    "code": "LAB_068",
+    "ref_class": "Abbott",
+    "device_company": "Abbott",
+    "device_name": "ARCHITECT i2000",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_068.html"
+  },
+  {
+    "code": "LAB_069",
+    "ref_class": "Abbott",
+    "device_company": "Abbott",
+    "device_name": "Alinity I",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_069.html"
+  },
+  {
+    "code": "LAB_070",
+    "ref_class": "Abbott",
+    "device_company": "Abbott",
+    "device_name": "ARCHITECT i1000",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_070.html"
+  },
+  {
+    "code": "LAB_071",
+    "ref_class": "Beckman Coulter Inc.",
+    "device_company": "Beckman Coulter Inc.",
+    "device_name": "UniCel DxI800",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_071.html"
+  },
+  {
+    "code": "LAB_072",
+    "ref_class": "Siemens Healthineers",
+    "device_company": "Siemens Healthineers",
+    "device_name": "Atellica IM 1600 Analyzer",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_072.html"
+  },
+  {
+    "code": "LAB_073",
+    "ref_class": "Abbott",
+    "device_company": "Abbott",
+    "device_name": "Alinity I",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_073.html"
+  },
+  {
+    "code": "LAB_074",
+    "ref_class": "Abbott",
+    "device_company": "Abbott",
+    "device_name": "Alinity I",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_074.html"
+  },
+  {
+    "code": "LAB_075",
+    "ref_class": "Siemens Healthineers",
+    "device_company": "Siemens Healthineers",
+    "device_name": "Atellica IM 1600 Analyzer",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_075.html"
+  },
+  {
+    "code": "LAB_076",
+    "ref_class": "Abbott",
+    "device_company": "Abbott",
+    "device_name": "Alinity I",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_076.html"
+  },
+  {
+    "code": "LAB_077",
+    "ref_class": "Abbott",
+    "device_company": "Abbott",
+    "device_name": "Alinity I",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_077.html"
+  },
+  {
+    "code": "LAB_078",
+    "ref_class": "Abbott",
+    "device_company": "Abbott",
+    "device_name": "Alinity I",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_078.html"
+  },
+  {
+    "code": "LAB_079",
+    "ref_class": "Siemens Healthineers",
+    "device_company": "Siemens Healthineers",
+    "device_name": "Atellica IM 1600 Analyzer",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_079.html"
+  },
+  {
+    "code": "LAB_080",
+    "ref_class": "Biomerieux",
+    "device_company": "Biomerieux",
+    "device_name": "Vidas",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_080.html"
+  },
+  {
+    "code": "LAB_081",
+    "ref_class": "Abbott",
+    "device_company": "Abbott",
+    "device_name": "Alinity I",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_081.html"
+  },
+  {
+    "code": "LAB_082",
+    "ref_class": "Siemens Healthineers",
+    "device_company": "Siemens Healthineers",
+    "device_name": "Atellica IM 1300 Analyzer",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_082.html"
+  },
+  {
+    "code": "LAB_083",
+    "ref_class": "Siemens Healthineers",
+    "device_company": "Siemens Healthineers",
+    "device_name": "Atellica IM 1600 Analyzer",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_083.html"
+  },
+  {
+    "code": "LAB_084",
+    "ref_class": "Siemens Healthineers",
+    "device_company": "Siemens Healthineers",
+    "device_name": "Atellica IM 1300 Analyzer",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_084.html"
+  },
+  {
+    "code": "LAB_085",
+    "ref_class": "Abbott",
+    "device_company": "Abbott",
+    "device_name": "Alinity I",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_085.html"
+  },
+  {
+    "code": "LAB_086",
+    "ref_class": "Abbott",
+    "device_company": "Abbott",
+    "device_name": "Alinity I",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_086.html"
+  },
+  {
+    "code": "LAB_087",
+    "ref_class": "Siemens Healthineers",
+    "device_company": "Siemens Healthineers",
+    "device_name": "Atellica IM 1600 Analyzer",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_087.html"
+  },
+  {
+    "code": "LAB_088",
+    "ref_class": "Abbott",
+    "device_company": "Abbott",
+    "device_name": "Alinity I",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_088.html"
+  },
+  {
+    "code": "LAB_089",
+    "ref_class": "Siemens Healthineers",
+    "device_company": "Siemens Healthineers",
+    "device_name": "Atellica IM 1600 Analyzer",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_089.html"
+  },
+  {
+    "code": "LAB_090",
+    "ref_class": "Abbott",
+    "device_company": "Abbott",
+    "device_name": "Alinity I",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_090.html"
+  },
+  {
+    "code": "LAB_091",
+    "ref_class": "Abbott",
+    "device_company": "Abbott",
+    "device_name": "ARCHITECT i2000",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_091.html"
+  },
+  {
+    "code": "LAB_092",
+    "ref_class": "Abbott",
+    "device_company": "Abbott",
+    "device_name": "ARCHITECT i2000",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_092.html"
+  },
+  {
+    "code": "LAB_093",
+    "ref_class": "Siemens Healthineers",
+    "device_company": "Siemens Healthineers",
+    "device_name": "Atellica IM 1600 Analyzer",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_093.html"
+  },
+  {
+    "code": "LAB_094",
+    "ref_class": "Abbott",
+    "device_company": "Abbott",
+    "device_name": "Alinity I",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_094.html"
+  },
+  {
+    "code": "LAB_095",
+    "ref_class": "Abbott",
+    "device_company": "Abbott",
+    "device_name": "Alinity I",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_095.html"
+  },
+  {
+    "code": "LAB_096",
+    "ref_class": "Siemens Healthineers",
+    "device_company": "Siemens Healthineers",
+    "device_name": "Atellica IM 1600 Analyzer",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_096.html"
+  },
+  {
+    "code": "LAB_097",
+    "ref_class": "Beckman Coulter Inc.",
+    "device_company": "Beckman Coulter Inc.",
+    "device_name": "Access2",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_097.html"
+  },
+  {
+    "code": "LAB_098",
+    "ref_class": "Siemens Healthineers",
+    "device_company": "Siemens Healthineers",
+    "device_name": "Atellica IM 1600 Analyzer",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_098.html"
+  },
+  {
+    "code": "LAB_099",
+    "ref_class": "Abbott",
+    "device_company": "Abbott",
+    "device_name": "Alinity I",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_099.html"
+  },
+  {
+    "code": "LAB_100",
+    "ref_class": "Abbott",
+    "device_company": "Abbott",
+    "device_name": "Alinity I",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_100.html"
+  },
+  {
+    "code": "LAB_101",
+    "ref_class": "Beckman Coulter Inc.",
+    "device_company": "Beckman Coulter Inc.",
+    "device_name": "UniCel DxI800",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_101.html"
+  },
+  {
+    "code": "LAB_102",
+    "ref_class": "Biomerieux",
+    "device_company": "Biomerieux",
+    "device_name": "Mini vidas",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_102.html"
+  },
+  {
+    "code": "LAB_103",
+    "ref_class": "Beckman Coulter Inc.",
+    "device_company": "Beckman Coulter Inc.",
+    "device_name": "UniCel DxI800",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_103.html"
+  },
+  {
+    "code": "LAB_104",
+    "ref_class": "Abbott",
+    "device_company": "Abbott",
+    "device_name": "ARCHITECT i2000",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_104.html"
+  },
+  {
+    "code": "LAB_105",
+    "ref_class": "Abbott",
+    "device_company": "Abbott",
+    "device_name": "ARCHITECT i2000",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_105.html"
+  },
+  {
+    "code": "LAB_106",
+    "ref_class": "Abbott",
+    "device_company": "Abbott",
+    "device_name": "Alinity I",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_106.html"
+  },
+  {
+    "code": "LAB_107",
+    "ref_class": "Abbott",
+    "device_company": "Abbott",
+    "device_name": "ARCHITECT i2000",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_107.html"
+  },
+  {
+    "code": "LAB_108",
+    "ref_class": "Siemens Healthineers",
+    "device_company": "Siemens Healthineers",
+    "device_name": "Atellica IM 1600 Analyzer",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_108.html"
+  },
+  {
+    "code": "LAB_109",
+    "ref_class": "Abbott",
+    "device_company": "Abbott",
+    "device_name": "Alinity I",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_109.html"
+  },
+  {
+    "code": "LAB_110",
+    "ref_class": "Abbott",
+    "device_company": "Abbott",
+    "device_name": "ARCHITECT i1000",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_110.html"
+  },
+  {
+    "code": "LAB_111",
+    "ref_class": "Abbott",
+    "device_company": "Abbott",
+    "device_name": "Alinity I",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_111.html"
+  },
+  {
+    "code": "LAB_112",
+    "ref_class": "Siemens Healthineers",
+    "device_company": "Siemens Healthineers",
+    "device_name": "Atellica IM 1600 Analyzer",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_112.html"
+  },
+  {
+    "code": "LAB_113",
+    "ref_class": "Beckman Coulter Inc.",
+    "device_company": "Beckman Coulter Inc.",
+    "device_name": "Access2",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_113.html"
+  },
+  {
+    "code": "LAB_114",
+    "ref_class": "Abbott",
+    "device_company": "Abbott",
+    "device_name": "Alinity I",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_114.html"
+  },
+  {
+    "code": "LAB_115",
+    "ref_class": "Abbott",
+    "device_company": "Abbott",
+    "device_name": "Alinity I",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_115.html"
+  },
+  {
+    "code": "LAB_116",
+    "ref_class": "Siemens Healthineers",
+    "device_company": "Siemens Healthineers",
+    "device_name": "Atellica IM 1600 Analyzer",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_116.html"
+  },
+  {
+    "code": "LAB_117",
+    "ref_class": "Siemens Healthineers",
+    "device_company": "Siemens Healthineers",
+    "device_name": "Atellica IM 1600 Analyzer",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_117.html"
+  },
+  {
+    "code": "LAB_118",
+    "ref_class": "Abbott",
+    "device_company": "Abbott",
+    "device_name": "Alinity I",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_118.html"
+  },
+  {
+    "code": "LAB_119",
+    "ref_class": "Siemens Healthineers",
+    "device_company": "Siemens Healthineers",
+    "device_name": "Atellica IM 1600 Analyzer",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_119.html"
+  },
+  {
+    "code": "LAB_120",
+    "ref_class": "Abbott",
+    "device_company": "Abbott",
+    "device_name": "Alinity I",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_120.html"
+  },
+  {
+    "code": "LAB_121",
+    "ref_class": "Siemens Healthineers",
+    "device_company": "Siemens Healthineers",
+    "device_name": "Atellica IM 1600 Analyzer",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_121.html"
+  },
+  {
+    "code": "LAB_122",
+    "ref_class": "Abbott",
+    "device_company": "Abbott",
+    "device_name": "Alinity I",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_122.html"
+  },
+  {
+    "code": "LAB_123",
+    "ref_class": "Abbott",
+    "device_company": "Abbott",
+    "device_name": "Alinity I",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_123.html"
+  },
+  {
+    "code": "LAB_124",
+    "ref_class": "Abbott",
+    "device_company": "Abbott",
+    "device_name": "ARCHITECT i1000",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_124.html"
+  },
+  {
+    "code": "LAB_125",
+    "ref_class": "Siemens Healthineers",
+    "device_company": "Siemens Healthineers",
+    "device_name": "Atellica IM 1300 Analyzer",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_125.html"
+  },
+  {
+    "code": "LAB_126",
+    "ref_class": "Beckman Coulter Inc.",
+    "device_company": "Beckman Coulter Inc.",
+    "device_name": "UniCel DxI800",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_126.html"
+  },
+  {
+    "code": "LAB_127",
+    "ref_class": "㈜아이센스",
+    "device_company": "㈜아이센스",
+    "device_name": "ivisen IA-1100",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_127.html"
+  },
+  {
+    "code": "LAB_128",
+    "ref_class": "Siemens Healthineers",
+    "device_company": "Siemens Healthineers",
+    "device_name": "Atellica IM 1300 Analyzer",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_128.html"
+  },
+  {
+    "code": "LAB_129",
+    "ref_class": "Beckman Coulter Inc.",
+    "device_company": "Beckman Coulter Inc.",
+    "device_name": "Access2",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_129.html"
+  },
+  {
+    "code": "LAB_130",
+    "ref_class": "Abbott",
+    "device_company": "Abbott",
+    "device_name": "Alinity I",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_130.html"
+  },
+  {
+    "code": "LAB_131",
+    "ref_class": "Siemens Healthineers",
+    "device_company": "Siemens Healthineers",
+    "device_name": "Atellica IM 1600 Analyzer",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_131.html"
+  },
+  {
+    "code": "LAB_132",
+    "ref_class": "Abbott",
+    "device_company": "Abbott",
+    "device_name": "Alinity I",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_132.html"
+  },
+  {
+    "code": "LAB_133",
+    "ref_class": "Abbott",
+    "device_company": "Abbott",
+    "device_name": "ARCHITECT i1000",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_133.html"
+  },
+  {
+    "code": "LAB_134",
+    "ref_class": "Abbott",
+    "device_company": "Abbott",
+    "device_name": "Alinity I",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_134.html"
+  },
+  {
+    "code": "LAB_135",
+    "ref_class": "Abbott",
+    "device_company": "Abbott",
+    "device_name": "ARCHITECT i1000",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_135.html"
+  },
+  {
+    "code": "LAB_136",
+    "ref_class": "Beckman Coulter Inc.",
+    "device_company": "Beckman Coulter Inc.",
+    "device_name": "UniCel DxC800",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_136.html"
+  },
+  {
+    "code": "LAB_137",
+    "ref_class": "Abbott",
+    "device_company": "Abbott",
+    "device_name": "Alinity I",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_137.html"
+  },
+  {
+    "code": "LAB_138",
+    "ref_class": "Abbott",
+    "device_company": "Abbott",
+    "device_name": "ARCHITECT i1000",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_138.html"
+  },
+  {
+    "code": "LAB_139",
+    "ref_class": "Abbott",
+    "device_company": "Abbott",
+    "device_name": "ARCHITECT i1000",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_139.html"
+  },
+  {
+    "code": "LAB_140",
+    "ref_class": "Beckman Coulter Inc.",
+    "device_company": "Beckman Coulter Inc.",
+    "device_name": "UniCel DxI800",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_140.html"
+  },
+  {
+    "code": "LAB_141",
+    "ref_class": "Abbott",
+    "device_company": "Abbott",
+    "device_name": "Alinity I",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_141.html"
+  },
+  {
+    "code": "LAB_142",
+    "ref_class": "Beckman Coulter Inc.",
+    "device_company": "Beckman Coulter Inc.",
+    "device_name": "UniCel DxI800",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_142.html"
+  },
+  {
+    "code": "LAB_143",
+    "ref_class": "Ortho Clinical Diagnostics",
+    "device_company": "Ortho Clinical Diagnostics",
+    "device_name": "Vitros3600",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_143.html"
+  },
+  {
+    "code": "LAB_144",
+    "ref_class": "Siemens Healthineers",
+    "device_company": "Siemens Healthineers",
+    "device_name": "ADVIA Centaur® CP Immunoassay System",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_144.html"
+  },
+  {
+    "code": "LAB_145",
+    "ref_class": "Abbott",
+    "device_company": "Abbott",
+    "device_name": "Alinity I",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_145.html"
+  },
+  {
+    "code": "LAB_146",
+    "ref_class": "Beckman Coulter Inc.",
+    "device_company": "Beckman Coulter Inc.",
+    "device_name": "UniCel DxI800",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_146.html"
+  },
+  {
+    "code": "LAB_147",
+    "ref_class": "Beckman Coulter Inc.",
+    "device_company": "Beckman Coulter Inc.",
+    "device_name": "UniCel DxI800",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_147.html"
+  },
+  {
+    "code": "LAB_148",
+    "ref_class": "Abbott",
+    "device_company": "Abbott",
+    "device_name": "ARCHITECT i1000",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_148.html"
+  },
+  {
+    "code": "LAB_149",
+    "ref_class": "Biomerieux",
+    "device_company": "Biomerieux",
+    "device_name": "Vidas",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_149.html"
+  },
+  {
+    "code": "LAB_150",
+    "ref_class": "Abbott",
+    "device_company": "Abbott",
+    "device_name": "ARCHITECT i2000",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_150.html"
+  },
+  {
+    "code": "LAB_151",
+    "ref_class": "Beckman Coulter Inc.",
+    "device_company": "Beckman Coulter Inc.",
+    "device_name": "Access2",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_151.html"
+  },
+  {
+    "code": "LAB_152",
+    "ref_class": "Abbott",
+    "device_company": "Abbott",
+    "device_name": "Alinity I",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_152.html"
+  },
+  {
+    "code": "LAB_153",
+    "ref_class": "Abbott",
+    "device_company": "Abbott",
+    "device_name": "Alinity I",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_153.html"
+  },
+  {
+    "code": "LAB_154",
+    "ref_class": "Siemens Healthineers",
+    "device_company": "Siemens Healthineers",
+    "device_name": "Atellica IM 1300 Analyzer",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_154.html"
+  },
+  {
+    "code": "LAB_155",
+    "ref_class": "Abbott",
+    "device_company": "Abbott",
+    "device_name": "Alinity I",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_155.html"
+  },
+  {
+    "code": "LAB_156",
+    "ref_class": "Abbott",
+    "device_company": "Abbott",
+    "device_name": "ARCHITECT i1000",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_156.html"
+  },
+  {
+    "code": "LAB_157",
+    "ref_class": "Abbott",
+    "device_company": "Abbott",
+    "device_name": "Alinity I",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_157.html"
+  },
+  {
+    "code": "LAB_158",
+    "ref_class": "Ortho Clinical Diagnostics",
+    "device_company": "Ortho Clinical Diagnostics",
+    "device_name": "Vitros XT7600",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_158.html"
+  },
+  {
+    "code": "LAB_159",
+    "ref_class": "Abbott",
+    "device_company": "Abbott",
+    "device_name": "Alinity I",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_159.html"
+  },
+  {
+    "code": "LAB_160",
+    "ref_class": "Abbott",
+    "device_company": "Abbott",
+    "device_name": "Alinity I",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_160.html"
+  },
+  {
+    "code": "LAB_161",
+    "ref_class": "Abbott",
+    "device_company": "Abbott",
+    "device_name": "Alinity I",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_161.html"
+  },
+  {
+    "code": "LAB_162",
+    "ref_class": "Abbott",
+    "device_company": "Abbott",
+    "device_name": "ARCHITECT i1000",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_162.html"
+  },
+  {
+    "code": "LAB_163",
+    "ref_class": "Abbott",
+    "device_company": "Abbott",
+    "device_name": "ARCHITECT i2000",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_163.html"
+  },
+  {
+    "code": "LAB_164",
+    "ref_class": "Abbott",
+    "device_company": "Abbott",
+    "device_name": "Alinity I",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_164.html"
+  },
+  {
+    "code": "LAB_165",
+    "ref_class": "Siemens Healthineers",
+    "device_company": "Siemens Healthineers",
+    "device_name": "Atellica IM 1300 Analyzer",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_165.html"
+  },
+  {
+    "code": "LAB_166",
+    "ref_class": "Abbott",
+    "device_company": "Abbott",
+    "device_name": "ARCHITECT i1000",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_166.html"
+  },
+  {
+    "code": "LAB_167",
+    "ref_class": "Abbott",
+    "device_company": "Abbott",
+    "device_name": "Alinity I",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_167.html"
+  },
+  {
+    "code": "LAB_168",
+    "ref_class": "Abbott",
+    "device_company": "Abbott",
+    "device_name": "Alinity I",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_168.html"
+  },
+  {
+    "code": "LAB_169",
+    "ref_class": "Abbott",
+    "device_company": "Abbott",
+    "device_name": "Alinity I",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_169.html"
+  },
+  {
+    "code": "LAB_170",
+    "ref_class": "Beckman Coulter Inc.",
+    "device_company": "Beckman Coulter Inc.",
+    "device_name": "UniCel DxI800",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_170.html"
+  },
+  {
+    "code": "LAB_171",
+    "ref_class": "Siemens Healthineers",
+    "device_company": "Siemens Healthineers",
+    "device_name": "Atellica IM 1600 Analyzer",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_171.html"
+  },
+  {
+    "code": "LAB_172",
+    "ref_class": "Siemens Healthineers",
+    "device_company": "Siemens Healthineers",
+    "device_name": "Atellica IM 1600 Analyzer",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_172.html"
+  },
+  {
+    "code": "LAB_173",
+    "ref_class": "Siemens Healthineers",
+    "device_company": "Siemens Healthineers",
+    "device_name": "Atellica IM 1600 Analyzer",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_173.html"
+  },
+  {
+    "code": "LAB_174",
+    "ref_class": "Abbott",
+    "device_company": "Abbott",
+    "device_name": "Alinity I",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_174.html"
+  },
+  {
+    "code": "LAB_175",
+    "ref_class": "Abbott",
+    "device_company": "Abbott",
+    "device_name": "ARCHITECT i1000",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_175.html"
+  },
+  {
+    "code": "LAB_176",
+    "ref_class": "Beckman Coulter Inc.",
+    "device_company": "Beckman Coulter Inc.",
+    "device_name": "Access2",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_176.html"
+  },
+  {
+    "code": "LAB_177",
+    "ref_class": "Beckman Coulter Inc.",
+    "device_company": "Beckman Coulter Inc.",
+    "device_name": "Others",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_177.html"
+  },
+  {
+    "code": "LAB_178",
+    "ref_class": "Beckman Coulter Inc.",
+    "device_company": "Beckman Coulter Inc.",
+    "device_name": "UniCel DxI800",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_178.html"
+  },
+  {
+    "code": "LAB_179",
+    "ref_class": "Abbott",
+    "device_company": "Abbott",
+    "device_name": "ARCHITECT i2000",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_179.html"
+  },
+  {
+    "code": "LAB_180",
+    "ref_class": "Abbott",
+    "device_company": "Abbott",
+    "device_name": "Alinity I",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_180.html"
+  },
+  {
+    "code": "LAB_181",
+    "ref_class": "Abbott",
+    "device_company": "Abbott",
+    "device_name": "Alinity I",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_181.html"
+  },
+  {
+    "code": "LAB_182",
+    "ref_class": "Siemens Healthineers",
+    "device_company": "Siemens Healthineers",
+    "device_name": "Atellica IM 1600 Analyzer",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_182.html"
+  },
+  {
+    "code": "LAB_183",
+    "ref_class": "Abbott",
+    "device_company": "Abbott",
+    "device_name": "ARCHITECT i1000",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_183.html"
+  },
+  {
+    "code": "LAB_184",
+    "ref_class": "Abbott",
+    "device_company": "Abbott",
+    "device_name": "Alinity I",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_184.html"
+  },
+  {
+    "code": "LAB_185",
+    "ref_class": "Beckman Coulter Inc.",
+    "device_company": "Beckman Coulter Inc.",
+    "device_name": "UniCel DxI800",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_185.html"
+  },
+  {
+    "code": "LAB_186",
+    "ref_class": "Beckman Coulter Inc.",
+    "device_company": "Beckman Coulter Inc.",
+    "device_name": "UniCel DxI800",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_186.html"
+  },
+  {
+    "code": "LAB_187",
+    "ref_class": "Siemens Healthineers",
+    "device_company": "Siemens Healthineers",
+    "device_name": "Atellica IM 1600 Analyzer",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_187.html"
+  },
+  {
+    "code": "LAB_188",
+    "ref_class": "Beckman Coulter Inc.",
+    "device_company": "Beckman Coulter Inc.",
+    "device_name": "UniCel DxI800",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_188.html"
+  },
+  {
+    "code": "LAB_189",
+    "ref_class": "Abbott",
+    "device_company": "Abbott",
+    "device_name": "Alinity I",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_189.html"
+  },
+  {
+    "code": "LAB_190",
+    "ref_class": "Beckman Coulter Inc.",
+    "device_company": "Beckman Coulter Inc.",
+    "device_name": "UniCel DxI800",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_190.html"
+  },
+  {
+    "code": "LAB_191",
+    "ref_class": "Abbott",
+    "device_company": "Abbott",
+    "device_name": "Alinity I",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_191.html"
+  },
+  {
+    "code": "LAB_192",
+    "ref_class": "Abbott",
+    "device_company": "Abbott",
+    "device_name": "Alinity I",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_192.html"
+  },
+  {
+    "code": "LAB_193",
+    "ref_class": "Siemens Healthineers",
+    "device_company": "Siemens Healthineers",
+    "device_name": "Atellica IM 1300 Analyzer",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_193.html"
+  },
+  {
+    "code": "LAB_194",
+    "ref_class": "Beckman Coulter Inc.",
+    "device_company": "Beckman Coulter Inc.",
+    "device_name": "Access2",
+    "reagent_company": "",
+    "reagent_name": "",
+    "has_report": false,
+    "report_url": "reports/institution_reports/LAB_194.html"
+  }
+];
+        const refClasses = ["Abbott", "Beckman Coulter Inc.", "Biomerieux", "Ortho Clinical Diagnostics", "Siemens Healthineers", "㈜아이센스"];
+        
+        // 초기화
+        function initializeDashboard() {
+            // 기준분류 필터 채우기
+            const filterSelect = document.getElementById('refClassFilter');
+            refClasses.forEach(refClass => {
+                const option = document.createElement('option');
+                option.value = refClass;
+                option.textContent = refClass;
+                filterSelect.appendChild(option);
+            });
+            
+            // 통계 업데이트
+            document.getElementById('statTotal').textContent = institutions.length;
+            document.getElementById('statRefClass').textContent = refClasses.length;
+            
+            // 기관 카드 렌더링
+            renderInstitutions();
+            
+            // 필터 이벤트 리스너
+            filterSelect.addEventListener('change', filterInstitutions);
+        }
+        
+        // 기관 카드 렌더링
+        function renderInstitutions() {
+            const grid = document.getElementById('institutionsGrid');
+            grid.innerHTML = '';
+            
+            institutions.forEach(inst => {
+                const card = document.createElement('div');
+                card.className = 'institution-card';
+                card.id = `card-${inst.code}`;
+                const btnClass = inst.has_report ? 'card-button' : 'card-button disabled';
+                const btnLabel = inst.has_report ? '📋 보고서 보기' : '보고서 없음';
+                const btnAttr = inst.has_report ? `onclick="openReport('${inst.code}', '${inst.report_url}')"` : 'disabled';
+                card.innerHTML = `
+                    <div class="card-header">
+                        <span class="card-code">${inst.code}</span>
+                        <span class="card-ref-class">${inst.ref_class}</span>
+                    </div>
+                    <div class="card-info">
+                        <div><span class="card-info-label">기기회사:</span> ${inst.device_company}</div>
+                        <div><span class="card-info-label">기기명:</span> ${inst.device_name}</div>
+                        <div><span class="card-info-label">시약회사:</span> ${inst.reagent_company || '미입력'}</div>
+                        <div><span class="card-info-label">시약명:</span> ${inst.reagent_name || '미입력'}</div>
+                    </div>
+                    <button class="${btnClass}" ${btnAttr}>${btnLabel}</button>
+                `;
+                grid.appendChild(card);
+            });
+            
+            updateCounts();
+        }
+        
+        // 기관 필터링
+        function filterInstitutions() {
+            const filterValue = document.getElementById('refClassFilter').value;
+            const cards = document.querySelectorAll('.institution-card');
+            
+            cards.forEach(card => {
+                const code = card.id.replace('card-', '');
+                const inst = institutions.find(i => i.code === code);
+                
+                if (filterValue === '' || inst.ref_class === filterValue) {
+                    card.classList.remove('hidden');
+                } else {
+                    card.classList.add('hidden');
+                }
+            });
+            
+            updateCounts();
+        }
+        
+        // 카운트 업데이트
+        function updateCounts() {
+            const total = institutions.length;
+            const displayed = document.querySelectorAll('.institution-card:not(.hidden)').length;
+            document.getElementById('totalCount').textContent = total;
+            document.getElementById('displayCount').textContent = displayed;
+        }
+        
+        // 보고서 열기
+        function openReport(labCode, reportUrl) {
+            const url = reportUrl || ('reports/institution_reports/' + labCode + '.html');
+            window.open(url, '_blank');
+        }
+        
+        // 필터 초기화
+        function resetFilter() {
+            document.getElementById('refClassFilter').value = '';
+            filterInstitutions();
+        }
+        
+        // 페이지 로드 시 초기화
+        window.addEventListener('load', initializeDashboard);
+    </script>
+</body>
+</html>
