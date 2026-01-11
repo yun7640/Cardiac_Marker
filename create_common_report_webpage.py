@@ -84,7 +84,7 @@ def create_distribution_chart(classification_data):
         return None
     
     # 차트 생성
-    fig, ax = plt.subplots(figsize=(14, 10), facecolor='white')
+    fig, ax = plt.subplots(figsize=(7, 5), facecolor='white')
     
     colors = ['#1e40af', '#0ea5e9', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899']
     colors = colors[:len(dist_data)]
@@ -157,8 +157,8 @@ def create_cv_comparison_chart(all_classification_data):
     if cv_avg.empty:
         return None
     
-    # 차트 생성 - 더 큰 figsize
-    fig, ax = plt.subplots(figsize=(16, 9), facecolor='white')
+    # 차트 생성 - 50% 크기
+    fig, ax = plt.subplots(figsize=(8, 4.5), facecolor='white')
     
     # 색상: CV값에 따라 달라짐
     colors = []
@@ -447,8 +447,8 @@ def create_html():
         
         /* 차트 섹션 */
         .charts-section {{
-            margin: 30px 0;
-            padding: 20px;
+            margin: 20px 0 40px 0;
+            padding: 15px;
             background-color: #f9fafb;
             border-radius: 8px;
             border: 1px solid #e5e7eb;
@@ -456,14 +456,14 @@ def create_html():
         
         .charts-grid {{
             display: grid;
-            grid-template-columns: 1fr;
-            gap: 20px;
-            margin-top: 20px;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 15px;
         }}
         
         .chart-container {{
             background: white;
-            padding: 20px;
+            padding: 10px;
             border-radius: 8px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
             text-align: center;
@@ -478,10 +478,10 @@ def create_html():
         }}
         
         .chart-title {{
-            font-size: 16px;
+            font-size: 13px;
             font-weight: bold;
             color: #1e40af;
-            margin-bottom: 15px;
+            margin-bottom: 8px;
             text-align: center;
         }}
         
@@ -591,6 +591,32 @@ def create_html():
         
         <button class="print-button" onclick="window.print()">📄 인쇄 / PDF 저장</button>
         
+        <!-- 상단 차트 섹션 -->
+        <div class="charts-section">
+            <div style="font-size: 15px; font-weight: bold; color: #1e40af; margin-bottom: 10px;">📊 기준분류별 분석</div>
+            <div class="charts-grid">
+"""
+    
+    # 상단에 표시할 차트들 생성
+    dist_chart = create_distribution_chart(all_classification_data[all_classification_data['검체명'].isin(specimens)])
+    if dist_chart:
+        html_content += f"""                <div class="chart-container">
+                    <div class="chart-title">🥧 제조사별 참가기관 분포</div>
+                    <img src="{dist_chart}" alt="기관 분포">
+                </div>
+"""
+    
+    cv_chart = create_cv_comparison_chart(all_classification_data)
+    if cv_chart:
+        html_content += f"""                <div class="chart-container">
+                    <div class="chart-title">📈 제조사별 변동계수(CV) 비교</div>
+                    <img src="{cv_chart}" alt="변동계수 비교">
+                </div>
+"""
+    
+    html_content += """            </div>
+        </div>
+        
         <!-- 검체별 보고서 -->
 """
     
@@ -655,21 +681,7 @@ def create_html():
                 </div>
             </div>
             
-            <!-- 첫번째 검체에서만 분포도 차트 표시 -->
-            {f'''
-            <div class="charts-section">
-                <div style="font-size: 16px; font-weight: bold; color: #1e40af; margin-bottom: 20px;">📊 기준분류별 분석</div>
-                <div class="charts-grid">
-                    <div class="chart-container">
-                        <div class="chart-title">🥧 기준분류별 기관 분포 (제조사별)</div>
-                        <img src="{create_distribution_chart(all_classification_data[all_classification_data['검체명'] == specimen])}" alt="기관 분포">
-                    </div>
-                </div>
-            </div>
-            ''' if is_first_specimen else ''}
-            
             <!-- 기준분류별 결과 -->
-
             <div class="specimen-subsection">
                 <div class="specimen-title">기준분류(의료기관 유형)별 결과</div>
                 
@@ -712,31 +724,6 @@ def create_html():
             </div>
         </div>
         
-"""
-    
-    # 3개 검체 평균 CV 비교 차트 (마지막 섹션)
-    html_content += """        <div class="section">
-            <div class="section-title">📊 전체 기준분류별 변동계수 분석</div>
-            
-            <div class="specimen-subsection">
-                <div class="specimen-title">3개 검체(CCA-25-04, CCA-25-05, CCA-25-06) 평균 변동계수 비교</div>
-                
-                <div class="charts-section" style="border: none; background-color: white;">
-                    <div class="chart-container" style="box-shadow: none; border: 1px solid #e5e7eb;">
-"""
-    
-    # CV 비교 차트 생성
-    cv_chart = create_cv_comparison_chart(all_classification_data)
-    if cv_chart:
-        html_content += f"""                        <img src="{cv_chart}" alt="변동계수 비교" style="max-width: 100%; width: 100%;">
-"""
-    
-    html_content += """                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- 하단 정보 -->
 """
     
     # 하단 정보
