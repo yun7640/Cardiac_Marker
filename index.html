@@ -31,6 +31,125 @@
             animation: fadeIn 0.5s ease-in;
         }
         
+        .login-container {
+            max-width: 450px;
+            width: 100%;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 50px;
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        .login-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .login-header h1 {
+            font-size: 32px;
+            color: #333;
+            margin-bottom: 10px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .login-header p {
+            color: #666;
+            font-size: 16px;
+        }
+        
+        .login-icon {
+            font-size: 80px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .login-form {
+            margin-bottom: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            display: block;
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            font-family: 'Malgun Gothic', '맑은 고딕', sans-serif;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .login-button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .login-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+        
+        .login-button:active {
+            transform: translateY(0);
+        }
+        
+        .error-message {
+            background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+            color: #dc2626;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: 600;
+            border-left: 4px solid #dc2626;
+            display: none;
+        }
+        
+        .login-info {
+            background: linear-gradient(135deg, #e7f3ff 0%, #dbeafe 100%);
+            padding: 15px;
+            border-left: 4px solid #667eea;
+            border-radius: 8px;
+            margin-top: 20px;
+            color: #333;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
@@ -232,7 +351,37 @@
     </style>
 </head>
 <body>
-    <div class="container">
+    <!-- 로그인 화면 -->
+    <div class="login-container" id="loginScreen">
+        <div class="login-icon">🔒</div>
+        <div class="login-header">
+            <h1>KEQAS 로그인</h1>
+            <p>외부정도관리 보고서 시스템</p>
+        </div>
+        <div class="error-message" id="errorMessage">
+            비밀번호가 올바르지 않습니다.
+        </div>
+        <form class="login-form" id="loginForm">
+            <div class="form-group">
+                <label class="form-label" for="username">사용자 ID</label>
+                <input type="text" id="username" class="form-input" placeholder="ID를 입력하세요" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="password">비밀번호</label>
+                <input type="password" id="password" class="form-input" placeholder="비밀번호를 입력하세요" required>
+            </div>
+            <button type="submit" class="login-button">로그인</button>
+        </form>
+        <div class="login-info">
+            <strong>ℹ️ 안내사항</strong><br>
+            • KEQAS 회원 기관만 접근 가능합니다<br>
+            • 로그인 정보는 관리자에게 문의하세요<br>
+            • 세션은 24시간 동안 유지됩니다
+        </div>
+    </div>
+    
+    <!-- 메인 콘텐츠 (로그인 후 표시) -->
+    <div class="container hidden" id="mainContent">
         <div class="header">
             <h1>🏥 KEQAS 심장표지자단백검사</h1>
             <p>High-Sensitivity Cardiac Troponin I (hs-TnI)</p>
@@ -279,6 +428,86 @@
     </div>
     
     <script>
+        // 로그인 설정
+        const LOGIN_CREDENTIALS = {
+            'keqas': 'keqas2025!',
+            'admin': 'admin1234',
+            'guest': 'guest2025'
+        };
+        
+        const SESSION_KEY = 'keqas_session';
+        const SESSION_DURATION = 24 * 60 * 60 * 1000; // 24시간
+        
+        // 세션 확인
+        function checkSession() {
+            const session = localStorage.getItem(SESSION_KEY);
+            if (session) {
+                const sessionData = JSON.parse(session);
+                const now = new Date().getTime();
+                if (now - sessionData.timestamp < SESSION_DURATION) {
+                    showMainContent(sessionData.username);
+                    return true;
+                } else {
+                    localStorage.removeItem(SESSION_KEY);
+                }
+            }
+            return false;
+        }
+        
+        // 로그인 처리
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            if (LOGIN_CREDENTIALS[username] && LOGIN_CREDENTIALS[username] === password) {
+                // 로그인 성공
+                const sessionData = {
+                    username: username,
+                    timestamp: new Date().getTime()
+                };
+                localStorage.setItem(SESSION_KEY, JSON.stringify(sessionData));
+                showMainContent(username);
+            } else {
+                // 로그인 실패
+                document.getElementById('errorMessage').style.display = 'block';
+                setTimeout(() => {
+                    document.getElementById('errorMessage').style.display = 'none';
+                }, 3000);
+            }
+        });
+        
+        // 메인 콘텐츠 표시
+        function showMainContent(username) {
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('mainContent').classList.remove('hidden');
+            
+            // 사용자 정보 표시
+            const footer = document.querySelector('.footer');
+            if (footer) {
+                const userInfo = document.createElement('p');
+                userInfo.style.marginTop = '10px';
+                userInfo.style.fontSize = '12px';
+                userInfo.style.color = '#667eea';
+                userInfo.innerHTML = `로그인: <strong>${username}</strong> | <a href="#" onclick="logout()" style="color: #dc2626; text-decoration: none;">로그아웃</a>`;
+                footer.insertBefore(userInfo, footer.firstChild);
+            }
+        }
+        
+        // 로그아웃
+        function logout() {
+            localStorage.removeItem(SESSION_KEY);
+            location.reload();
+        }
+        
+        // 페이지 로드 시 세션 확인
+        window.addEventListener('load', () => {
+            if (!checkSession()) {
+                document.getElementById('loginScreen').classList.remove('hidden');
+            }
+        });
+        
+        // 회차 데이터
         const rounds = [
             { year: 2025, round: 1, status: 'active', url: 'KEQAS_hs_TnI_Dashboard_2025_1.html' },
             { year: 2025, round: 2, status: 'active', url: 'KEQAS_hs_TnI_Dashboard_2025_2.html' }
