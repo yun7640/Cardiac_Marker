@@ -136,11 +136,11 @@ def create_distribution_chart(classification_data):
     return f"data:image/png;base64,{image_base64}"
 
 def create_cv_comparison_chart(all_classification_data):
-    """기준분류별 변동계수 비교 바차트 (3개 검체 평균)"""
+    """기준분류별 변동계수(CV%) 비교 바차트 (3개 검체 평균)"""
     if all_classification_data.empty:
         return None
     
-    # 3개 검체별로 변동계수 데이터 추출
+    # 3개 검체별로 변동계수(CV%) 데이터 추출
     cv_data_list = []
     for specimen in all_classification_data['검체명'].unique():
         specimen_data = all_classification_data[all_classification_data['검체명'] == specimen]
@@ -164,11 +164,11 @@ def create_cv_comparison_chart(all_classification_data):
     # 색상: CV값에 따라 달라짐
     colors = []
     for cv in cv_avg.values:
-        if cv <= 10:
+        if cv <= 5:
             colors.append('#10b981')  # 초록색 (우수)
-        elif cv <= 20:
+        elif cv <= 10:
             colors.append('#3b82f6')  # 파랑색 (양호)
-        elif cv <= 30:
+        elif cv <= 20:
             colors.append('#f59e0b')  # 주황색 (주의)
         else:
             colors.append('#ef4444')  # 빨강색 (부주의)
@@ -180,17 +180,17 @@ def create_cv_comparison_chart(all_classification_data):
         ax.text(val + 1.5, i, f'{val:.2f}%', va='center', fontsize=14, weight='bold', fontfamily='monospace')
     
     # 축 레이블 폰트 사이즈 증가
-    ax.set_xlabel('변동계수 (CV %)', fontsize=15, weight='bold')
+    ax.set_xlabel('변동계수(CV%)', fontsize=15, weight='bold')
     ax.set_ylabel('기준분류(제조사)', fontsize=15, weight='bold')
     ax.set_xticklabels(ax.get_xticklabels(), fontsize=13)
     ax.set_yticklabels(ax.get_yticklabels(), fontsize=13)
     
-    ax.set_title('기준분류별 변동계수(CV) 비교\n(CCA-25-04, CCA-25-05, CCA-25-06 평균)', 
+    ax.set_title('기준분류별 변동계수(CV%) 비교\n(CCA-25-04, CCA-25-05, CCA-25-06 평균)', 
                  fontsize=16, weight='bold', pad=30)
     
     # 참조선 추가 및 범례
-    ax.axvline(x=10, color='#10b981', linestyle='--', linewidth=2.5, alpha=0.7, label='우수 (≤10%)')
-    ax.axvline(x=20, color='#f59e0b', linestyle='--', linewidth=2.5, alpha=0.7, label='양호 (≤20%)')
+    ax.axvline(x=5, color='#10b981', linestyle='--', linewidth=2.5, alpha=0.7, label='우수 (≤5%)')
+    ax.axvline(x=10, color='#3b82f6', linestyle='--', linewidth=2.5, alpha=0.7, label='양호 (≤10%)')
     ax.legend(loc='lower right', fontsize=13, frameon=True, fancybox=True, shadow=True)
     
     ax.grid(axis='x', alpha=0.3, linestyle='--', linewidth=1)
@@ -645,7 +645,7 @@ def create_html():
                             <div class="stat-item-value">{format_number(row['표준편차'])}</div>
                         </div>
                         <div class="stat-item">
-                            <div class="stat-item-label">변동계수 (%)</div>
+                            <div class="stat-item-label">변동계수(CV%)</div>
                             <div class="stat-item-value">{format_number(row['변동계수'])}</div>
                         </div>
                         <div class="stat-item">
@@ -671,7 +671,7 @@ def create_html():
                             <th>표준편차</th>
                             <th>신뢰하한치</th>
                             <th>신뢰상한치</th>
-                            <th>변동계수 (%)</th>
+                            <th>변동계수(CV%)</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -721,8 +721,8 @@ def create_html():
     cv_chart = create_cv_comparison_chart(all_classification_data)
     if cv_chart:
         html_content += f"""                    <div class="chart-container">
-                        <div class="chart-title">📈 제조사별 변동계수(CV) 비교 (3개 검체 평균)</div>
-                        <img src="{cv_chart}" alt="변동계수 비교">
+                        <div class="chart-title">📈 제조사별 변동계수(CV%) 비교 (3개 검체 평균)</div>
+                        <img src="{cv_chart}" alt="변동계수(CV%) 비교">
                     </div>
 """
     
