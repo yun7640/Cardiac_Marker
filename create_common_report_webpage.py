@@ -151,9 +151,9 @@ def create_cv_comparison_chart(all_classification_data):
     if not cv_data_list:
         return None
     
-    # 기준분류별 CV 평균값 계산 (변동계수가 낮은 순으로 정렬)
+    # 기준분류별 CV 평균값 계산 (변동계수가 낮은 것이 맨 위에 오도록 역순 정렬)
     combined_cv = pd.concat(cv_data_list, ignore_index=True)
-    cv_avg = combined_cv.groupby('기준분류명')['변동계수'].mean().sort_values(ascending=True)
+    cv_avg = combined_cv.groupby('기준분류명')['변동계수'].mean().sort_values(ascending=False)
     
     if cv_avg.empty:
         return None
@@ -678,8 +678,8 @@ def create_html():
                     <tbody>
 """
         
-        # 해당 검체의 기준분류 데이터
-        specimen_classification = classification_data[classification_data['검체명'] == specimen]
+        # 해당 검체의 기준분류 데이터 (기관 수 많은 순으로 정렬)
+        specimen_classification = classification_data[classification_data['검체명'] == specimen].sort_values('기관수', ascending=False)
         
         for idx, cls_row in specimen_classification.iterrows():
             html_content += f"""                        <tr>
