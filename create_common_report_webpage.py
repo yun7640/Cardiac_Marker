@@ -77,8 +77,13 @@ def create_distribution_chart(classification_data):
     if classification_data.empty:
         return None
     
-    # 기준분류별 기관수 합산
-    dist_data = classification_data.groupby('기준분류명')['기관수'].sum().sort_values(ascending=False)
+    # 1번 검체 기준으로 기준분류별 기관수 합산
+    specimen_order = classification_data['검체명'].unique().tolist()
+    if not specimen_order:
+        return None
+    first_specimen = specimen_order[0]
+    first_specimen_data = classification_data[classification_data['검체명'] == first_specimen]
+    dist_data = first_specimen_data.groupby('기준분류명')['기관수'].sum().sort_values(ascending=False)
     
     if dist_data.empty:
         return None
