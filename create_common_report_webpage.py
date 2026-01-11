@@ -98,6 +98,10 @@ def create_distribution_chart(classification_data):
         textprops={'fontsize': 12, 'weight': 'bold'},
         wedgeprops=dict(edgecolor='white', linewidth=3)
     )
+
+    # 도넛 내부 텍스트 숨김 (라벨·비율 모두 범례로 이동)
+    for txt in texts:
+        txt.set_visible(False)
     
     # 중앙 원 (도넛 모양)
     centre_circle = plt.Circle((0, 0), 0.70, fc='white', edgecolor='white', linewidth=2)
