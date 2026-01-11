@@ -179,6 +179,8 @@ html_content = f"""<!DOCTYPE html>
             padding: 12px;
             transition: all 0.3s ease;
             cursor: pointer;
+            display: flex;
+            flex-direction: column;
         }}
         
         .institution-card:hover {{
@@ -219,6 +221,7 @@ html_content = f"""<!DOCTYPE html>
             font-size: 11px;
             color: #666;
             line-height: 1.6;
+            flex-grow: 1;
         }}
         
         .card-info-label {{
