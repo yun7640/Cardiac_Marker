@@ -191,6 +191,7 @@ def create_cv_comparison_chart(all_classification_data):
     # 참조선 추가 및 범례
     ax.axvline(x=5, color='#10b981', linestyle='--', linewidth=2.5, alpha=0.7, label='우수 (≤5%)')
     ax.axvline(x=10, color='#3b82f6', linestyle='--', linewidth=2.5, alpha=0.7, label='양호 (≤10%)')
+    ax.axvline(x=20, color='#f59e0b', linestyle='--', linewidth=2.5, alpha=0.7, label='주의 (≤20%)')
     ax.legend(loc='lower right', fontsize=13, frameon=True, fancybox=True, shadow=True)
     
     ax.grid(axis='x', alpha=0.3, linestyle='--', linewidth=1)
