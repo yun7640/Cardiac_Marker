@@ -151,13 +151,9 @@ def create_cv_comparison_chart(all_classification_data):
     if not cv_data_list:
         return None
     
-    # 기준분류별 CV 평균값 계산
+    # 기준분류별 CV 평균값 계산 (변동계수가 낮은 순으로 정렬)
     combined_cv = pd.concat(cv_data_list, ignore_index=True)
-    cv_avg = combined_cv.groupby('기준분류명')['변동계수'].mean()
-    
-    # 기관수 기준으로 정렬 (참가기관 많은 순)
-    org_count = combined_cv.groupby('기준분류명')['기관수'].sum().sort_values(ascending=False)
-    cv_avg = cv_avg.reindex(org_count.index)
+    cv_avg = combined_cv.groupby('기준분류명')['변동계수'].mean().sort_values(ascending=True)
     
     if cv_avg.empty:
         return None
