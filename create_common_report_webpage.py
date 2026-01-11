@@ -90,28 +90,22 @@ def create_distribution_chart(classification_data):
     colors = colors[:len(dist_data)]
     
     # 라벨은 표시하지 않고 범례만 사용
-    wedges, texts, autotexts = ax.pie(
+    wedges, texts = ax.pie(
         dist_data.values,
         labels=None,
-        autopct='%1.1f%%',
         startangle=90,
         colors=colors,
         textprops={'fontsize': 12, 'weight': 'bold'},
         wedgeprops=dict(edgecolor='white', linewidth=3)
     )
     
-    # 자동텍스트(퍼센트) 포맷팅
-    for autotext in autotexts:
-        autotext.set_color('white')
-        autotext.set_fontsize(11)
-        autotext.set_weight('bold')
-    
     # 중앙 원 (도넛 모양)
     centre_circle = plt.Circle((0, 0), 0.70, fc='white', edgecolor='white', linewidth=2)
     ax.add_artist(centre_circle)
     
-    # 범례 - 기관수만 표시
-    legend_labels = [f"{name}: {count}개" for name, count in zip(dist_data.index, dist_data.values)]
+    # 범례 - 기관수와 분포 비율 함께 표시
+    total = dist_data.sum()
+    legend_labels = [f"{name}: {count}개 ({count/total*100:.1f}%)" for name, count in zip(dist_data.index, dist_data.values)]
     ax.legend(
         legend_labels,
         loc='upper left',
@@ -713,25 +707,9 @@ def create_html():
     # 하단에 표시할 차트들 생성
     dist_chart = create_distribution_chart(all_classification_data[all_classification_data['검체명'].isin(specimens)])
     if dist_chart:
-        # 제조사별 분포 비율 계산
-        first_specimen_data = overall_data[overall_data['검체명'] == specimens[0]].iloc[0] if len(specimens) > 0 else None
-        dist_classification = all_classification_data[all_classification_data['검체명'] == specimens[0]].groupby('기준분류명')['기관수'].sum().sort_values(ascending=False) if len(specimens) > 0 else None
-        
-        distribution_info = ""
-        if dist_classification is not None:
-            total = dist_classification.sum()
-            distribution_info = "<div style='margin-left: 20px; font-size: 12px;'><strong>분포 비율:</strong><br>"
-            for name, count in dist_classification.items():
-                percentage = (count / total) * 100
-                distribution_info += f"{name}: {percentage:.1f}%<br>"
-            distribution_info += "</div>"
-        
-        html_content += f"""                    <div class="chart-container" style="display: flex; align-items: flex-start; gap: 20px;">
-                        <div style="flex: 1;">
-                            <div class="chart-title">🥧 제조사별 참가기관 분포 (CCA-25-04 기준)</div>
-                            <img src="{dist_chart}" alt="기관 분포" style="max-width: 100%; height: auto;">
-                        </div>
-                        {distribution_info}
+        html_content += f"""                    <div class="chart-container">
+                        <div class="chart-title">🥧 제조사별 참가기관 분포 (CCA-25-04 기준)</div>
+                        <img src="{dist_chart}" alt="기관 분포" style="max-width: 100%; height: auto;">
                     </div>
 """
     
