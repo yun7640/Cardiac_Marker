@@ -51,6 +51,14 @@ specimens = df[
     (df['세분류명'].isna() | (df['세분류명'] == ''))
 ]['검체명'].unique()
 
+# 기준분류별 데이터 미리 준비 (CV 비교 차트용)
+all_classification_data = df[
+    (df['기준분류명'].notna()) &
+    (df['기준분류명'] != '') &
+    (df['세분류명'].isna() | (df['세분류명'] == '')) &
+    (df['기관수'].notna())
+].copy()
+
 def format_number(value):
     """숫자 포맷팅"""
     if pd.isna(value):
@@ -65,7 +73,7 @@ def format_number(value):
         return str(value)
 
 def create_distribution_chart(classification_data):
-    """기준분류별 기관 분포 도넛 차트"""
+    """기준분류별 기관 분포 도넛 차트 (첫번째 검체 기준)"""
     if classification_data.empty:
         return None
     
@@ -76,7 +84,7 @@ def create_distribution_chart(classification_data):
         return None
     
     # 차트 생성
-    fig, ax = plt.subplots(figsize=(10, 8), facecolor='white')
+    fig, ax = plt.subplots(figsize=(14, 10), facecolor='white')
     
     colors = ['#1e40af', '#0ea5e9', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899']
     colors = colors[:len(dist_data)]
@@ -87,23 +95,33 @@ def create_distribution_chart(classification_data):
         autopct='%1.1f%%',
         startangle=90,
         colors=colors,
-        textprops={'fontsize': 11, 'weight': 'bold'},
-        wedgeprops=dict(edgecolor='white', linewidth=2)
+        textprops={'fontsize': 14, 'weight': 'bold'},
+        wedgeprops=dict(edgecolor='white', linewidth=3)
     )
+    
+    # 자동텍스트(퍼센트) 포맷팅
+    for autotext in autotexts:
+        autotext.set_color('white')
+        autotext.set_fontsize(13)
+        autotext.set_weight('bold')
     
     # 중앙 원 (도넛 모양)
     centre_circle = plt.Circle((0, 0), 0.70, fc='white', edgecolor='white', linewidth=2)
     ax.add_artist(centre_circle)
     
-    # 범례
+    # 범례 - 기관수 표시
+    legend_labels = [f"{name}: {count}개" for name, count in zip(dist_data.index, dist_data.values)]
     ax.legend(
-        [(f"{name}: {count}") for name, count in zip(dist_data.index, dist_data.values)],
+        legend_labels,
         loc='center left',
         bbox_to_anchor=(1, 0, 0.5, 1),
-        fontsize=10
+        fontsize=13,
+        frameon=True,
+        fancybox=True,
+        shadow=True
     )
     
-    ax.set_title('기준분류별 참가기관 분포', fontsize=14, weight='bold', pad=20)
+    ax.set_title('기준분류(제조사)별 참가기관 분포\n(CCA-25-04 기준)', fontsize=16, weight='bold', pad=30)
     
     plt.tight_layout()
     
@@ -116,24 +134,35 @@ def create_distribution_chart(classification_data):
     
     return f"data:image/png;base64,{image_base64}"
 
-def create_cv_comparison_chart(classification_data):
-    """기준분류별 변동계수 비교 바차트"""
-    if classification_data.empty:
+def create_cv_comparison_chart(all_classification_data):
+    """기준분류별 변동계수 비교 바차트 (3개 검체 평균)"""
+    if all_classification_data.empty:
         return None
     
-    # 변동계수가 있는 데이터만 필터링
-    cv_data = classification_data[classification_data['변동계수'].notna()].copy()
-    cv_data = cv_data.sort_values('변동계수', ascending=True)
+    # 3개 검체별로 변동계수 데이터 추출
+    cv_data_list = []
+    for specimen in all_classification_data['검체명'].unique():
+        specimen_data = all_classification_data[all_classification_data['검체명'] == specimen]
+        cv_filtered = specimen_data[specimen_data['변동계수'].notna()].copy()
+        if not cv_filtered.empty:
+            cv_data_list.append(cv_filtered)
     
-    if cv_data.empty:
+    if not cv_data_list:
         return None
     
-    # 차트 생성
-    fig, ax = plt.subplots(figsize=(12, 6), facecolor='white')
+    # 기준분류별 CV 평균값 계산
+    combined_cv = pd.concat(cv_data_list, ignore_index=True)
+    cv_avg = combined_cv.groupby('기준분류명')['변동계수'].mean().sort_values(ascending=True)
+    
+    if cv_avg.empty:
+        return None
+    
+    # 차트 생성 - 더 큰 figsize
+    fig, ax = plt.subplots(figsize=(16, 9), facecolor='white')
     
     # 색상: CV값에 따라 달라짐
     colors = []
-    for cv in cv_data['변동계수'].values:
+    for cv in cv_avg.values:
         if cv <= 10:
             colors.append('#10b981')  # 초록색 (우수)
         elif cv <= 20:
@@ -143,22 +172,28 @@ def create_cv_comparison_chart(classification_data):
         else:
             colors.append('#ef4444')  # 빨강색 (부주의)
     
-    bars = ax.barh(cv_data['기준분류명'], cv_data['변동계수'], color=colors, edgecolor='black', linewidth=1.5)
+    bars = ax.barh(cv_avg.index, cv_avg.values, color=colors, edgecolor='black', linewidth=2, height=0.6)
     
-    # 값 표시
-    for i, (bar, val) in enumerate(zip(bars, cv_data['변동계수'].values)):
-        ax.text(val + 1, i, f'{val:.1f}%', va='center', fontsize=10, weight='bold')
+    # 값 표시 - 바 오른쪽에 배치
+    for i, (bar, val) in enumerate(zip(bars, cv_avg.values)):
+        ax.text(val + 1.5, i, f'{val:.2f}%', va='center', fontsize=14, weight='bold', fontfamily='monospace')
     
-    ax.set_xlabel('변동계수 (%)', fontsize=12, weight='bold')
-    ax.set_title('기준분류별 변동계수(CV) 비교', fontsize=14, weight='bold', pad=20)
-    ax.set_xlim(0, max(cv_data['변동계수'].values) * 1.15)
+    # 축 레이블 폰트 사이즈 증가
+    ax.set_xlabel('변동계수 (CV %)', fontsize=15, weight='bold')
+    ax.set_ylabel('기준분류(제조사)', fontsize=15, weight='bold')
+    ax.set_xticklabels(ax.get_xticklabels(), fontsize=13)
+    ax.set_yticklabels(ax.get_yticklabels(), fontsize=13)
     
-    # 참조선 추가
-    ax.axvline(x=10, color='#10b981', linestyle='--', linewidth=1, alpha=0.5, label='우수 (≤10%)')
-    ax.axvline(x=20, color='#f59e0b', linestyle='--', linewidth=1, alpha=0.5, label='양호 (≤20%)')
-    ax.legend(loc='lower right', fontsize=9)
+    ax.set_title('기준분류별 변동계수(CV) 비교\n(CCA-25-04, CCA-25-05, CCA-25-06 평균)', 
+                 fontsize=16, weight='bold', pad=30)
     
-    ax.grid(axis='x', alpha=0.3, linestyle='--')
+    # 참조선 추가 및 범례
+    ax.axvline(x=10, color='#10b981', linestyle='--', linewidth=2.5, alpha=0.7, label='우수 (≤10%)')
+    ax.axvline(x=20, color='#f59e0b', linestyle='--', linewidth=2.5, alpha=0.7, label='양호 (≤20%)')
+    ax.legend(loc='lower right', fontsize=13, frameon=True, fancybox=True, shadow=True)
+    
+    ax.grid(axis='x', alpha=0.3, linestyle='--', linewidth=1)
+    ax.set_xlim(0, max(cv_avg.values) * 1.2)
     
     plt.tight_layout()
     
@@ -421,17 +456,18 @@ def create_html():
         
         .charts-grid {{
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            grid-template-columns: 1fr;
             gap: 20px;
             margin-top: 20px;
         }}
         
         .chart-container {{
             background: white;
-            padding: 15px;
+            padding: 20px;
             border-radius: 8px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
             text-align: center;
+            width: 100%;
         }}
         
         .chart-container img {{
@@ -442,10 +478,10 @@ def create_html():
         }}
         
         .chart-title {{
-            font-size: 14px;
+            font-size: 16px;
             font-weight: bold;
             color: #1e40af;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
             text-align: center;
         }}
         
@@ -558,13 +594,15 @@ def create_html():
         <!-- 검체별 보고서 -->
 """
     
-    for specimen in specimens:
+    for specimen_idx, specimen in enumerate(specimens):
         specimen_data = overall_data[overall_data['검체명'] == specimen]
         
         if specimen_data.empty:
             continue
         
         row = specimen_data.iloc[0]
+        is_first_specimen = (specimen_idx == 0)
+        is_last_specimen = (specimen_idx == len(specimens) - 1)
         
         html_content += f"""        <div class="section">
             <div class="section-title">{specimen}</div>
@@ -617,37 +655,21 @@ def create_html():
                 </div>
             </div>
             
-            <!-- 차트 섹션 -->
+            <!-- 첫번째 검체에서만 분포도 차트 표시 -->
+            {f'''
             <div class="charts-section">
                 <div style="font-size: 16px; font-weight: bold; color: #1e40af; margin-bottom: 20px;">📊 기준분류별 분석</div>
                 <div class="charts-grid">
-"""
-        
-        # 해당 검체의 기준분류 데이터
-        specimen_classification = classification_data[classification_data['검체명'] == specimen]
-        
-        # 분포도 차트
-        dist_chart = create_distribution_chart(specimen_classification)
-        if dist_chart:
-            html_content += f"""                    <div class="chart-container">
-                        <div class="chart-title">🥧 기준분류별 기관 분포</div>
-                        <img src="{dist_chart}" alt="기관 분포">
+                    <div class="chart-container">
+                        <div class="chart-title">🥧 기준분류별 기관 분포 (제조사별)</div>
+                        <img src="{create_distribution_chart(all_classification_data[all_classification_data['검체명'] == specimen])}" alt="기관 분포">
                     </div>
-"""
-        
-        # CV 비교 차트
-        cv_chart = create_cv_comparison_chart(specimen_classification)
-        if cv_chart:
-            html_content += f"""                    <div class="chart-container">
-                        <div class="chart-title">📈 기준분류별 변동계수(CV) 비교</div>
-                        <img src="{cv_chart}" alt="변동계수 비교">
-                    </div>
-"""
-        
-        html_content += """                </div>
+                </div>
             </div>
+            ''' if is_first_specimen else ''}
             
             <!-- 기준분류별 결과 -->
+
             <div class="specimen-subsection">
                 <div class="specimen-title">기준분류(의료기관 유형)별 결과</div>
                 
@@ -690,6 +712,31 @@ def create_html():
             </div>
         </div>
         
+"""
+    
+    # 3개 검체 평균 CV 비교 차트 (마지막 섹션)
+    html_content += """        <div class="section">
+            <div class="section-title">📊 전체 기준분류별 변동계수 분석</div>
+            
+            <div class="specimen-subsection">
+                <div class="specimen-title">3개 검체(CCA-25-04, CCA-25-05, CCA-25-06) 평균 변동계수 비교</div>
+                
+                <div class="charts-section" style="border: none; background-color: white;">
+                    <div class="chart-container" style="box-shadow: none; border: 1px solid #e5e7eb;">
+"""
+    
+    # CV 비교 차트 생성
+    cv_chart = create_cv_comparison_chart(all_classification_data)
+    if cv_chart:
+        html_content += f"""                        <img src="{cv_chart}" alt="변동계수 비교" style="max-width: 100%; width: 100%;">
+"""
+    
+    html_content += """                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 하단 정보 -->
 """
     
     # 하단 정보
