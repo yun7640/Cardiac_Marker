@@ -89,20 +89,21 @@ def create_distribution_chart(classification_data):
     colors = ['#1e40af', '#0ea5e9', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899']
     colors = colors[:len(dist_data)]
     
+    # 라벨은 표시하지 않고 범례만 사용
     wedges, texts, autotexts = ax.pie(
         dist_data.values,
-        labels=dist_data.index,
+        labels=None,
         autopct='%1.1f%%',
         startangle=90,
         colors=colors,
-        textprops={'fontsize': 14, 'weight': 'bold'},
+        textprops={'fontsize': 12, 'weight': 'bold'},
         wedgeprops=dict(edgecolor='white', linewidth=3)
     )
     
     # 자동텍스트(퍼센트) 포맷팅
     for autotext in autotexts:
         autotext.set_color('white')
-        autotext.set_fontsize(13)
+        autotext.set_fontsize(11)
         autotext.set_weight('bold')
     
     # 중앙 원 (도넛 모양)
@@ -591,32 +592,6 @@ def create_html():
         
         <button class="print-button" onclick="window.print()">📄 인쇄 / PDF 저장</button>
         
-        <!-- 상단 차트 섹션 -->
-        <div class="charts-section">
-            <div style="font-size: 15px; font-weight: bold; color: #1e40af; margin-bottom: 10px;">📊 기준분류별 분석</div>
-            <div class="charts-grid">
-"""
-    
-    # 상단에 표시할 차트들 생성
-    dist_chart = create_distribution_chart(all_classification_data[all_classification_data['검체명'].isin(specimens)])
-    if dist_chart:
-        html_content += f"""                <div class="chart-container">
-                    <div class="chart-title">🥧 제조사별 참가기관 분포</div>
-                    <img src="{dist_chart}" alt="기관 분포">
-                </div>
-"""
-    
-    cv_chart = create_cv_comparison_chart(all_classification_data)
-    if cv_chart:
-        html_content += f"""                <div class="chart-container">
-                    <div class="chart-title">📈 제조사별 변동계수(CV) 비교</div>
-                    <img src="{cv_chart}" alt="변동계수 비교">
-                </div>
-"""
-    
-    html_content += """            </div>
-        </div>
-        
         <!-- 검체별 보고서 -->
 """
     
@@ -721,6 +696,37 @@ def create_html():
         
         html_content += """                    </tbody>
                 </table>
+            </div>
+        </div>
+        
+"""
+    
+    # 하단 차트 섹션 추가
+    html_content += """        <div class="section">
+            <div class="section-title">📊 기준분류별 분석</div>
+            
+            <div class="charts-section">
+                <div class="charts-grid">
+"""
+    
+    # 하단에 표시할 차트들 생성
+    dist_chart = create_distribution_chart(all_classification_data[all_classification_data['검체명'].isin(specimens)])
+    if dist_chart:
+        html_content += f"""                    <div class="chart-container">
+                        <div class="chart-title">🥧 제조사별 참가기관 분포 (CCA-25-04 기준)</div>
+                        <img src="{dist_chart}" alt="기관 분포">
+                    </div>
+"""
+    
+    cv_chart = create_cv_comparison_chart(all_classification_data)
+    if cv_chart:
+        html_content += f"""                    <div class="chart-container">
+                        <div class="chart-title">📈 제조사별 변동계수(CV) 비교 (3개 검체 평균)</div>
+                        <img src="{cv_chart}" alt="변동계수 비교">
+                    </div>
+"""
+    
+    html_content += """                </div>
             </div>
         </div>
         
