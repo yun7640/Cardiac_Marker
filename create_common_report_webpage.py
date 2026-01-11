@@ -110,13 +110,13 @@ def create_distribution_chart(classification_data):
     centre_circle = plt.Circle((0, 0), 0.70, fc='white', edgecolor='white', linewidth=2)
     ax.add_artist(centre_circle)
     
-    # 범례 - 기관수 표시
+    # 범례 - 기관수만 표시
     legend_labels = [f"{name}: {count}개" for name, count in zip(dist_data.index, dist_data.values)]
     ax.legend(
         legend_labels,
-        loc='center left',
-        bbox_to_anchor=(1, 0, 0.5, 1),
-        fontsize=13,
+        loc='upper left',
+        bbox_to_anchor=(1.05, 1),
+        fontsize=12,
         frameon=True,
         fancybox=True,
         shadow=True
@@ -188,11 +188,11 @@ def create_cv_comparison_chart(all_classification_data):
     ax.set_title('기준분류별 변동계수(CV%) 비교\n(CCA-25-04, CCA-25-05, CCA-25-06 평균)', 
                  fontsize=16, weight='bold', pad=30)
     
-    # 참조선 추가 및 범례
+    # 참조선 추가 및 범례 (차트 밖으로 배치)
     ax.axvline(x=5, color='#10b981', linestyle='--', linewidth=2.5, alpha=0.7, label='우수 (≤5%)')
     ax.axvline(x=10, color='#3b82f6', linestyle='--', linewidth=2.5, alpha=0.7, label='양호 (≤10%)')
     ax.axvline(x=20, color='#f59e0b', linestyle='--', linewidth=2.5, alpha=0.7, label='주의 (≤20%)')
-    ax.legend(loc='lower right', fontsize=13, frameon=True, fancybox=True, shadow=True)
+    ax.legend(loc='upper left', bbox_to_anchor=(1.05, 1), fontsize=13, frameon=True, fancybox=True, shadow=True)
     
     ax.grid(axis='x', alpha=0.3, linestyle='--', linewidth=1)
     ax.set_xlim(0, max(cv_avg.values) * 1.2)
@@ -713,9 +713,25 @@ def create_html():
     # 하단에 표시할 차트들 생성
     dist_chart = create_distribution_chart(all_classification_data[all_classification_data['검체명'].isin(specimens)])
     if dist_chart:
-        html_content += f"""                    <div class="chart-container">
-                        <div class="chart-title">🥧 제조사별 참가기관 분포 (CCA-25-04 기준)</div>
-                        <img src="{dist_chart}" alt="기관 분포">
+        # 제조사별 분포 비율 계산
+        first_specimen_data = overall_data[overall_data['검체명'] == specimens[0]].iloc[0] if len(specimens) > 0 else None
+        dist_classification = all_classification_data[all_classification_data['검체명'] == specimens[0]].groupby('기준분류명')['기관수'].sum().sort_values(ascending=False) if len(specimens) > 0 else None
+        
+        distribution_info = ""
+        if dist_classification is not None:
+            total = dist_classification.sum()
+            distribution_info = "<div style='margin-left: 20px; font-size: 12px;'><strong>분포 비율:</strong><br>"
+            for name, count in dist_classification.items():
+                percentage = (count / total) * 100
+                distribution_info += f"{name}: {percentage:.1f}%<br>"
+            distribution_info += "</div>"
+        
+        html_content += f"""                    <div class="chart-container" style="display: flex; align-items: flex-start; gap: 20px;">
+                        <div style="flex: 1;">
+                            <div class="chart-title">🥧 제조사별 참가기관 분포 (CCA-25-04 기준)</div>
+                            <img src="{dist_chart}" alt="기관 분포" style="max-width: 100%; height: auto;">
+                        </div>
+                        {distribution_info}
                     </div>
 """
     
