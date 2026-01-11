@@ -78,20 +78,7 @@ def create_distribution_chart(classification_data):
         return None
     
     # 기준분류별 기관수 합산
-    dist_data = classification_data.groupby('기준분류명')['기관수'].sum()
-    
-    # 제조사명 정렬: 영어 알파벳 먼저, 그 다음 한글 가나다순
-    def sort_key(name):
-        if name and len(name) > 0:
-            first_char = name[0]
-            # 영어는 0으로 시작, 한글은 1로 시작하여 영어가 먼저 오도록
-            if ord(first_char) < 128:  # ASCII (영어)
-                return (0, name)
-            else:  # 한글 및 기타
-                return (1, name)
-        return (2, name)
-    
-    dist_data = dist_data.sort_index(key=lambda x: x.map(sort_key))
+    dist_data = classification_data.groupby('기준분류명')['기관수'].sum().sort_values(ascending=False)
     
     if dist_data.empty:
         return None
@@ -168,18 +155,9 @@ def create_cv_comparison_chart(all_classification_data):
     combined_cv = pd.concat(cv_data_list, ignore_index=True)
     cv_avg = combined_cv.groupby('기준분류명')['변동계수'].mean()
     
-    # 제조사명 정렬: 영어 알파벳 먼저, 그 다음 한글 가나다순
-    def sort_key(name):
-        if name and len(name) > 0:
-            first_char = name[0]
-            # 영어는 0으로 시작, 한글은 1로 시작하여 영어가 먼저 오도록
-            if ord(first_char) < 128:  # ASCII (영어)
-                return (0, name)
-            else:  # 한글 및 기타
-                return (1, name)
-        return (2, name)
-    
-    cv_avg = cv_avg.sort_index(key=lambda x: x.map(sort_key))
+    # 기관수 기준으로 정렬 (참가기관 많은 순)
+    org_count = combined_cv.groupby('기준분류명')['기관수'].sum().sort_values(ascending=False)
+    cv_avg = cv_avg.reindex(org_count.index)
     
     if cv_avg.empty:
         return None
