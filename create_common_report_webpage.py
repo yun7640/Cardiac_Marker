@@ -683,6 +683,12 @@ def create_html():
         
         # 해당 검체의 기준분류 데이터 (기관 수 많은 순으로 정렬)
         specimen_classification = classification_data[classification_data['검체명'] == specimen].sort_values('기관수', ascending=False)
+        specimen_subclassification = df[
+            (df['검체명'] == specimen) &
+            (df['기준분류명'].notna()) & (df['기준분류명'] != '') &
+            (df['세분류명'].notna()) & (df['세분류명'] != '') &
+            (df['기관수'].notna())
+        ].copy()
         
         for idx, cls_row in specimen_classification.iterrows():
             html_content += f"""                        <tr>
@@ -695,6 +701,21 @@ def create_html():
                             <td>{format_number(cls_row['하한치'])}</td>
                             <td>{format_number(cls_row['상한치'])}</td>
                             <td>{format_number(cls_row['변동계수'])}</td>
+                        </tr>
+"""
+            # 세분류(하위) 정보 추가
+            sub_rows = specimen_subclassification[specimen_subclassification['기준분류명'] == cls_row['기준분류명']]
+            for _, sub_row in sub_rows.iterrows():
+                html_content += f"""                        <tr>
+                            <td style="padding-left: 16px; color: #555;">↳ {sub_row['세분류명'] if pd.notna(sub_row['세분류명']) else '-'}</td>
+                            <td>{format_number(sub_row['기관수'])}</td>
+                            <td>{format_number(sub_row['기관수_OUT'])}</td>
+                            <td>{format_number(sub_row['중간값'])}</td>
+                            <td>{format_number(sub_row['평균'])}</td>
+                            <td>{format_number(sub_row['표준편차'])}</td>
+                            <td>{format_number(sub_row['하한치'])}</td>
+                            <td>{format_number(sub_row['상한치'])}</td>
+                            <td>{format_number(sub_row['변동계수'])}</td>
                         </tr>
 """
         
