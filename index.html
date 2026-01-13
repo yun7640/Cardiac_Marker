@@ -507,8 +507,8 @@
     <script>
         // 데이터 비식별화 페이지 열기
         function openDeidentifier() {
-            // 직접 Streamlit 앱을 새 창에서 열기 시도
-            const win = window.open('http://localhost:8501', '_blank');
+            // 직접 비식별화 Streamlit 앱을 새 창에서 열기
+            const win = window.open('http://localhost:8503', '_blank');
             
             // 페이지 로드 확인 후 안내 메시지 표시
             setTimeout(() => {
@@ -582,12 +582,12 @@
                     
                     <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #ddd;">
                         <strong style="color: #10b981;">✅ 실행 후:</strong><br>
-                        <span style="color: #666; font-size: 12px;">브라우저가 자동으로 열리거나, <code style="background: #e8f5e9; padding: 2px 6px; border-radius: 3px;">http://localhost:8501</code> 에 접속하세요</span>
+                        <span style="color: #666; font-size: 12px;">브라우저가 자동으로 열리거나, <code style="background: #e8f5e9; padding: 2px 6px; border-radius: 3px;">http://localhost:8503</code> 에 접속하세요</span>
                     </div>
                 </div>
                 <div style="display: flex; gap: 10px; margin-top: 30px;">
                     <button onclick="document.getElementById('deidentifierModal').remove()" style="flex: 1; padding: 12px; background: #e0e0e0; color: #333; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 14px;">닫기</button>
-                    <button onclick="window.open('http://localhost:8501', '_blank');" style="flex: 1; padding: 12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 14px;">🌐 브라우저 열기</button>
+                    <button onclick="window.open('http://localhost:8503', '_blank');" style="flex: 1; padding: 12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 14px;">🌐 브라우저 열기</button>
                 </div>
             `;
             
