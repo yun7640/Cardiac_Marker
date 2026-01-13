@@ -473,12 +473,16 @@
                 </a>
                 <a href="javascript:openDeidentifier()" class="link-card">
                     <div class="link-icon">🔐</div>
-                    <div class="link-title">데이터 비식별화</div>
+                    <div class="link-title">데이터 비식별화
+                        <span onclick="event.preventDefault(); event.stopPropagation(); showDeidentifierHelp();" style="cursor: pointer; font-size: 12px; color: #999; margin-left: 5px;" title="실행 방법 보기">ℹ️</span>
+                    </div>
                     <div class="link-desc">개인정보 보호 도구</div>
                 </a>
                 <a href="javascript:openReportGenerator()" class="link-card">
                     <div class="link-icon">🔧</div>
-                    <div class="link-title">기관별보고서 생성</div>
+                    <div class="link-title">기관별보고서 생성
+                        <span onclick="event.preventDefault(); event.stopPropagation(); showReportGeneratorHelp();" style="cursor: pointer; font-size: 12px; color: #999; margin-left: 5px;" title="실행 방법 보기">ℹ️</span>
+                    </div>
                     <div class="link-desc">새로운 보고서 생성 도구</div>
                 </a>
             </div>
@@ -503,21 +507,19 @@
     <script>
         // 데이터 비식별화 페이지 열기
         function openDeidentifier() {
-            // Streamlit 앱 URL 설정
-            const streamlitUrl = 'http://localhost:8501'; // 로컬 Streamlit 앱
+            // 직접 Streamlit 앱을 새 창에서 열기 시도
+            const win = window.open('http://localhost:8501', '_blank');
             
-            // 로컬 Streamlit 서버가 실행 중인지 확인하고, 없으면 안내 메시지 표시
-            try {
-                fetch(streamlitUrl, { mode: 'no-cors' })
-                    .then(() => {
-                        window.open(streamlitUrl + '?page=deidentify_web', '_blank');
-                    })
-                    .catch(() => {
-                        showDeidentifierModal();
-                    });
-            } catch (e) {
-                showDeidentifierModal();
-            }
+            // 페이지 로드 확인 후 안내 메시지 표시
+            setTimeout(() => {
+                // 모달은 바로 표시하지 않고, 사용자가 필요할 때만 표시
+                // 서버가 실행되지 않은 경우 브라우저가 자동으로 오류 표시
+            }, 1000);
+        }
+        
+        // 데이터 비식별화 도움말 표시
+        function showDeidentifierHelp() {
+            showDeidentifierModal();
         }
         
         // 데이터 비식별화 안내 모달
@@ -601,21 +603,19 @@
         
         // 기관별보고서 생성 페이지 열기
         function openReportGenerator() {
-            // Streamlit 앱 URL 설정
-            const streamlitUrl = 'http://localhost:8501'; // 로컬 Streamlit 앱
+            // 직접 Streamlit 앱을 새 창에서 열기 시도
+            const win = window.open('http://localhost:8501', '_blank');
             
-            // 로컬 Streamlit 서버가 실행 중인지 확인하고, 없으면 안내 메시지 표시
-            try {
-                fetch(streamlitUrl, { mode: 'no-cors' })
-                    .then(() => {
-                        window.open(streamlitUrl + '?page=generate_report_web', '_blank');
-                    })
-                    .catch(() => {
-                        showReportGeneratorModal();
-                    });
-            } catch (e) {
-                showReportGeneratorModal();
-            }
+            // 페이지 로드 확인 후 안내 메시지 표시
+            setTimeout(() => {
+                // 모달은 바로 표시하지 않고, 사용자가 필요할 때만 표시
+                // 서버가 실행되지 않은 경우 브라우저가 자동으로 오류 표시
+            }, 1000);
+        }
+        
+        // 기관별보고서 생성 도움말 표시
+        function showReportGeneratorHelp() {
+            showReportGeneratorModal();
         }
         
         // 기관별보고서 생성 안내 모달
