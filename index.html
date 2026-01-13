@@ -507,14 +507,13 @@
     <script>
         // 데이터 비식별화 페이지 열기
         function openDeidentifier() {
-            // 직접 비식별화 Streamlit 앱을 새 창에서 열기
-            const win = window.open('http://localhost:8503', '_blank');
+            // Streamlit Cloud 또는 로컬 서버로 연결
+            // Streamlit Cloud URL로 변경하세요: https://your-username-deidentify.streamlit.app
+            // 또는 로컬 서버: http://localhost:8503
+            const streamlitUrl = 'http://localhost:8503';
+            const cloudUrl = 'http://localhost:8503'; // Streamlit Cloud URL로 변경 필요
             
-            // 페이지 로드 확인 후 안내 메시지 표시
-            setTimeout(() => {
-                // 모달은 바로 표시하지 않고, 사용자가 필요할 때만 표시
-                // 서버가 실행되지 않은 경우 브라우저가 자동으로 오류 표시
-            }, 1000);
+            const win = window.open(streamlitUrl, '_blank');
         }
         
         // 데이터 비식별화 도움말 표시
@@ -556,13 +555,16 @@
             content.innerHTML = `
                 <h2 style="color: #333; margin-bottom: 20px; font-size: 24px;">🔐 데이터 비식별화</h2>
                 <p style="color: #666; margin-bottom: 15px; font-size: 16px; line-height: 1.6;">
-                    데이터를 비식별화하기 위해서는 <strong>로컬에서 Streamlit 앱을 실행</strong>해야 합니다.
+                    <strong>두 가지 방법</strong>으로 사용할 수 있습니다:
                 </p>
-                <div style="background: #fff3cd; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #ffc107; text-align: left; font-size: 13px; color: #856404;">
-                    <strong>⚠️ 중요:</strong> 현재 Streamlit 서버가 실행되지 않았습니다. 아래 방법을 따라 먼저 서버를 시작해주세요.
+                
+                <div style="background: #e8f5e9; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #10b981; text-align: left;">
+                    <strong style="color: #10b981; display: block; margin-bottom: 10px;">✅ 방법 1: 로컬 서버 (권장)</strong>
+                    <span style="color: #666; font-size: 13px;">로컬 컴퓨터에서 Streamlit 서버를 실행하면 더 빠르고 안정적입니다.</span>
                 </div>
+                
                 <div style="background: #f0f4ff; padding: 20px; border-radius: 10px; margin: 20px 0; text-align: left; color: #333; font-size: 13px; border: 2px solid #667eea;">
-                    <strong style="color: #667eea; display: block; margin-bottom: 15px;">📝 실행 방법:</strong>
+                    <strong style="color: #667eea; display: block; margin-bottom: 15px;">📝 로컬 실행 방법:</strong>
                     
                     <div style="margin-bottom: 15px;">
                         <strong style="color: #667eea;">1️⃣ 터미널/명령프롬프트 열기</strong><br>
@@ -576,7 +578,7 @@
                     
                     <div style="margin-bottom: 10px;">
                         <strong style="color: #667eea;">3️⃣ Streamlit 앱 실행</strong><br>
-                        <code style="background: #fff; padding: 8px 10px; border-radius: 5px; font-family: monospace; font-size: 11px; display: block; margin-top: 5px; border: 1px solid #ddd; word-break: break-all;" id="deidentifyCmd">streamlit run 분석용코드/deidentify_web.py</code>
+                        <code style="background: #fff; padding: 8px 10px; border-radius: 5px; font-family: monospace; font-size: 11px; display: block; margin-top: 5px; border: 1px solid #ddd; word-break: break-all;" id="deidentifyCmd">streamlit run 분석용코드/deidentify_web.py --server.port 8503</code>
                         <button onclick="copyToClipboard('deidentifyCmd')" style="margin-top: 8px; padding: 6px 12px; background: #667eea; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 12px; font-weight: bold;">📋 명령어 복사</button>
                     </div>
                     
@@ -585,9 +587,18 @@
                         <span style="color: #666; font-size: 12px;">브라우저가 자동으로 열리거나, <code style="background: #e8f5e9; padding: 2px 6px; border-radius: 3px;">http://localhost:8503</code> 에 접속하세요</span>
                     </div>
                 </div>
+                
+                <div style="background: #fff3cd; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #ffc107; text-align: left;">
+                    <strong style="color: #ff6b6b; display: block; margin-bottom: 10px;">📌 방법 2: Streamlit Cloud (클라우드)</strong>
+                    <span style="color: #666; font-size: 13px;">
+                        GitHub에 코드를 푸시하고 <strong>Streamlit Cloud</strong>에 배포하면 어디서나 접속 가능합니다.<br>
+                        <a href="https://streamlit.io/cloud" target="_blank" style="color: #667eea; text-decoration: none;">Streamlit Cloud 배포하기</a>
+                    </span>
+                </div>
+                
                 <div style="display: flex; gap: 10px; margin-top: 30px;">
                     <button onclick="document.getElementById('deidentifierModal').remove()" style="flex: 1; padding: 12px; background: #e0e0e0; color: #333; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 14px;">닫기</button>
-                    <button onclick="window.open('http://localhost:8503', '_blank');" style="flex: 1; padding: 12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 14px;">🌐 브라우저 열기</button>
+                    <button onclick="window.open('http://localhost:8503', '_blank');" style="flex: 1; padding: 12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 14px;">🌐 로컬 서버 열기</button>
                 </div>
             `;
             
@@ -603,14 +614,13 @@
         
         // 기관별보고서 생성 페이지 열기
         function openReportGenerator() {
-            // 직접 Streamlit 앱을 새 창에서 열기 시도
-            const win = window.open('http://localhost:8501', '_blank');
+            // Streamlit Cloud 또는 로컬 서버로 연결
+            // Streamlit Cloud URL로 변경하세요: https://your-username-report.streamlit.app
+            // 또는 로컬 서버: http://localhost:8501
+            const streamlitUrl = 'http://localhost:8501';
+            const cloudUrl = 'http://localhost:8501'; // Streamlit Cloud URL로 변경 필요
             
-            // 페이지 로드 확인 후 안내 메시지 표시
-            setTimeout(() => {
-                // 모달은 바로 표시하지 않고, 사용자가 필요할 때만 표시
-                // 서버가 실행되지 않은 경우 브라우저가 자동으로 오류 표시
-            }, 1000);
+            const win = window.open(streamlitUrl, '_blank');
         }
         
         // 기관별보고서 생성 도움말 표시
@@ -652,12 +662,50 @@
             content.innerHTML = `
                 <h2 style="color: #333; margin-bottom: 20px; font-size: 24px;">🔧 기관별보고서 생성</h2>
                 <p style="color: #666; margin-bottom: 15px; font-size: 16px; line-height: 1.6;">
-                    기관별 보고서를 생성하기 위해서는 <strong>로컬에서 Streamlit 앱을 실행</strong>해야 합니다.
+                    <strong>두 가지 방법</strong>으로 사용할 수 있습니다:
                 </p>
-                <div style="background: #fff3cd; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #ffc107; text-align: left; font-size: 13px; color: #856404;">
-                    <strong>⚠️ 중요:</strong> 현재 Streamlit 서버가 실행되지 않았습니다. 아래 방법을 따라 먼저 서버를 시작해주세요.
+                
+                <div style="background: #e8f5e9; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #10b981; text-align: left;">
+                    <strong style="color: #10b981; display: block; margin-bottom: 10px;">✅ 방법 1: 로컬 서버 (권장)</strong>
+                    <span style="color: #666; font-size: 13px;">로컬 컴퓨터에서 Streamlit 서버를 실행하면 더 빠르고 안정적입니다.</span>
                 </div>
+                
                 <div style="background: #f0f4ff; padding: 20px; border-radius: 10px; margin: 20px 0; text-align: left; color: #333; font-size: 13px; border: 2px solid #667eea;">
+                    <strong style="color: #667eea; display: block; margin-bottom: 15px;">📝 로컬 실행 방법:</strong>
+                    
+                    <div style="margin-bottom: 15px;">
+                        <strong style="color: #667eea;">1️⃣ 터미널/명령프롬프트 열기</strong><br>
+                        <span style="color: #666; font-size: 12px;">프로젝트 폴더에서 PowerShell을 열어주세요</span>
+                    </div>
+                    
+                    <div style="margin-bottom: 15px;">
+                        <strong style="color: #667eea;">2️⃣ 가상환경 활성화</strong><br>
+                        <code style="background: #fff; padding: 8px 10px; border-radius: 5px; font-family: monospace; font-size: 11px; display: block; margin-top: 5px; border: 1px solid #ddd; word-break: break-all;">.venv\\Scripts\\activate</code>
+                    </div>
+                    
+                    <div style="margin-bottom: 10px;">
+                        <strong style="color: #667eea;">3️⃣ Streamlit 앱 실행</strong><br>
+                        <code style="background: #fff; padding: 8px 10px; border-radius: 5px; font-family: monospace; font-size: 11px; display: block; margin-top: 5px; border: 1px solid #ddd; word-break: break-all;" id="streamlitCmd">streamlit run 분석용코드/generate_report_web.py</code>
+                        <button onclick="copyToClipboard('streamlitCmd')" style="margin-top: 8px; padding: 6px 12px; background: #667eea; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 12px; font-weight: bold;">📋 명령어 복사</button>
+                    </div>
+                    
+                    <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #ddd;">
+                        <strong style="color: #10b981;">✅ 실행 후:</strong><br>
+                        <span style="color: #666; font-size: 12px;">브라우저가 자동으로 열리거나, <code style="background: #e8f5e9; padding: 2px 6px; border-radius: 3px;">http://localhost:8501</code> 에 접속하세요</span>
+                    </div>
+                </div>
+                
+                <div style="background: #fff3cd; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #ffc107; text-align: left;">
+                    <strong style="color: #ff6b6b; display: block; margin-bottom: 10px;">📌 방법 2: Streamlit Cloud (클라우드)</strong>
+                    <span style="color: #666; font-size: 13px;">
+                        GitHub에 코드를 푸시하고 <strong>Streamlit Cloud</strong>에 배포하면 어디서나 접속 가능합니다.<br>
+                        <a href="https://streamlit.io/cloud" target="_blank" style="color: #667eea; text-decoration: none;">Streamlit Cloud 배포하기</a>
+                    </span>
+                </div>
+                
+                <div style="display: flex; gap: 10px; margin-top: 30px;">
+                    <button onclick="document.getElementById('reportGeneratorModal').remove()" style="flex: 1; padding: 12px; background: #e0e0e0; color: #333; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 14px;">닫기</button>
+                    <button onclick="window.open('http://localhost:8501', '_blank');" style="flex: 1; padding: 12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 14px;">🌐 로컬 서버 열기</button>
                     <strong style="color: #667eea; display: block; margin-bottom: 15px;">📝 실행 방법:</strong>
                     
                     <div style="margin-bottom: 15px;">
