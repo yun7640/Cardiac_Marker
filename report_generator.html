@@ -433,7 +433,7 @@
         }
 
         function parseCSV(csvText, filename) {
-            // CSV 파싱
+            // CSV 파싱 (개선된 버전)
             const lines = csvText.split('\n');
             const headers = lines[0].split(',').map(h => h.trim());
             
@@ -441,10 +441,27 @@
             for (let i = 1; i < lines.length; i++) {
                 if (lines[i].trim() === '') continue;
                 
-                const values = lines[i].split(',');
+                // CSV 파싱 개선 - 쉼표로 구분하되 따옴표 처리
+                const values = [];
+                let current = '';
+                let inQuotes = false;
+                
+                for (let j = 0; j < lines[i].length; j++) {
+                    const char = lines[i][j];
+                    if (char === '"') {
+                        inQuotes = !inQuotes;
+                    } else if (char === ',' && !inQuotes) {
+                        values.push(current.trim());
+                        current = '';
+                    } else {
+                        current += char;
+                    }
+                }
+                values.push(current.trim());
+                
                 const row = {};
                 headers.forEach((header, index) => {
-                    row[header] = values[index] ? values[index].trim() : '';
+                    row[header] = values[index] || '';
                 });
                 data.push(row);
             }
@@ -478,7 +495,18 @@
                 
                 const roundSelect = document.getElementById('round-select');
                 roundSelect.innerHTML = `
-                    <option value="${roundInfo.year}-${roundInfo.round}">${roundInfo.label}</option>
+                    <option value="${roundInfo.year}-${roundInfo.round}" selected>${roundInfo.label}</option>
+                `;
+            } else {
+                // 파일명에서 회차를 찾을 수 없는 경우 기본값 설정
+                roundInfo = {
+                    year: 2025,
+                    round: 2,
+                    label: '2025년 2회차'
+                };
+                const roundSelect = document.getElementById('round-select');
+                roundSelect.innerHTML = `
+                    <option value="2025-2" selected>2025년 2회차 (기본값)</option>
                 `;
             }
         }
@@ -488,13 +516,13 @@
 
             const data = uploadedData.data;
             
-            // 기관 수
-            const labs = new Set(data.map(row => row['기관명'] || row['Lab Name'] || row['기관코드']));
+            // 기관 수 (기관코드로 확인)
+            const labs = new Set(data.map(row => row['기관코드'] || row['기관명'] || row['Lab Name']));
             
-            // 검체별 데이터 수
+            // 검체별 데이터 수 (검체명으로 확인)
             const samples = {};
             data.forEach(row => {
-                const sample = row['검체'] || row['Sample'] || row['검체코드'] || 'Unknown';
+                const sample = row['검체명'] || row['검체'] || row['Sample'] || 'Unknown';
                 samples[sample] = (samples[sample] || 0) + 1;
             });
 
@@ -533,25 +561,27 @@
             showProgress(true);
             generatedReports = [];
 
-            // 기관별로 데이터 그룹화
+            // 기관별로 데이터 그룹화 (기관코드 사용)
             const labData = {};
             uploadedData.data.forEach(row => {
-                const labName = row['기관명'] || row['Lab Name'] || row['기관코드'];
-                if (!labData[labName]) {
-                    labData[labName] = [];
+                const labCode = row['기관코드'] || row['기관명'] || row['Lab Name'];
+                if (labCode && labCode.trim() !== '') {
+                    if (!labData[labCode]) {
+                        labData[labCode] = [];
+                    }
+                    labData[labCode].push(row);
                 }
-                labData[labName].push(row);
             });
 
             const labs = Object.keys(labData);
             let completed = 0;
 
             // 각 기관별 보고서 생성
-            labs.forEach((labName, index) => {
+            labs.forEach((labCode, index) => {
                 setTimeout(() => {
-                    const report = generateLabReport(labName, labData[labName]);
+                    const report = generateLabReport(labCode, labData[labCode]);
                     generatedReports.push({
-                        labName: labName,
+                        labCode: labCode,
                         html: report
                     });
 
@@ -567,19 +597,26 @@
             });
         }
 
-        function generateLabReport(labName, data) {
+        function generateLabReport(labCode, data) {
             // 간단한 HTML 보고서 생성
             const samples = {};
             const results = {};
             
+            // 기기 정보 추출
+            const firstRow = data[0] || {};
+            const deviceCompany = firstRow['기기회사명'] || '-';
+            const deviceName = firstRow['기기명'] || '-';
+            
             data.forEach(row => {
-                const sample = row['검체'] || row['Sample'] || 'Sample';
-                const result = parseFloat(row['결과'] || row['Result'] || row['측정값'] || 0);
+                const sample = row['검체명'] || row['검체'] || row['Sample'] || 'Sample';
+                const result = parseFloat(row['검사결과'] || row['결과'] || row['Result'] || row['측정값'] || 0);
                 
                 if (!samples[sample]) {
                     samples[sample] = [];
                 }
-                samples[sample].push(result);
+                if (!isNaN(result)) {
+                    samples[sample].push(result);
+                }
             });
 
             // 각 검체별 통계 계산
@@ -604,7 +641,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>${labName} - KEQAS 보고서</title>
+    <title>${labCode} - KEQAS 보고서</title>
     <style>
         body {
             font-family: 'Malgun Gothic', sans-serif;
@@ -654,8 +691,9 @@
 <body>
     <div class="header">
         <h1>KEQAS 외부정도관리 보고서</h1>
-        <h2>${labName}</h2>
+        <h2>${labCode}</h2>
         <p>${roundInfo.label} - High-Sensitivity Cardiac Troponin I</p>
+        <p>기기: ${deviceCompany} ${deviceName}</p>
         <p>생성일: ${new Date().toLocaleDateString('ko-KR')}</p>
     </div>
 
@@ -702,8 +740,8 @@
             <tbody>`;
 
             data.forEach((row, index) => {
-                const sample = row['검체'] || row['Sample'] || 'Sample';
-                const result = row['결과'] || row['Result'] || row['측정값'] || '-';
+                const sample = row['검체명'] || row['검체'] || row['Sample'] || 'Sample';
+                const result = row['검사결과'] || row['결과'] || row['Result'] || row['측정값'] || '-';
                 html += `
                 <tr>
                     <td>${index + 1}</td>
@@ -766,7 +804,7 @@
                 const item = document.createElement('div');
                 item.className = 'report-item';
                 item.innerHTML = `
-                    <span>📄 ${report.labName}</span>
+                    <span>📄 ${report.labCode}</span>
                     <button class="btn" onclick="downloadSingleReport(${index})">
                         다운로드
                     </button>
@@ -781,7 +819,7 @@
         function downloadSingleReport(index) {
             const report = generatedReports[index];
             const blob = new Blob([report.html], { type: 'text/html' });
-            const filename = `Report_${report.labName}_${roundInfo.year}_${roundInfo.round}.html`;
+            const filename = `Report_${report.labCode}_${roundInfo.year}_${roundInfo.round}.html`;
             saveAs(blob, filename);
         }
 
@@ -790,7 +828,7 @@
             const folder = zip.folder(`reports_${roundInfo.year}_${roundInfo.round}`);
 
             generatedReports.forEach(report => {
-                const filename = `Report_${report.labName}.html`;
+                const filename = `Report_${report.labCode}.html`;
                 folder.file(filename, report.html);
             });
 
