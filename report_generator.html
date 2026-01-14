@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KEQAS 기관별 보고서 생성</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            color: #e0e0e0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            padding: 30px 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        header h1 {
+            font-size: 2.2em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .card h2 {
+            margin-bottom: 20px;
+            color: #667eea;
+            border-bottom: 2px solid rgba(102, 126, 234, 0.3);
+            padding-bottom: 10px;
+        }
+
+        .upload-section {
+            border: 2px dashed rgba(255,255,255,0.2);
+            border-radius: 10px;
+            padding: 40px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .upload-section:hover {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .upload-section.dragover {
+            border-color: #764ba2;
+            background: rgba(118, 75, 162, 0.2);
+        }
+
+        .upload-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+            opacity: 0.7;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            margin: 5px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #434343 0%, #000000 100%);
+        }
+
+        select {
+            background: rgba(255,255,255,0.1);
+            color: #e0e0e0;
+            padding: 10px 15px;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 8px;
+            font-size: 1em;
+            width: 100%;
+            max-width: 300px;
+            cursor: pointer;
+        }
+
+        select option {
+            background: #1a1a2e;
+            color: #e0e0e0;
+        }
+
+        .progress-container {
+            display: none;
+            margin: 20px 0;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .info-box {
+            background: rgba(102, 126, 234, 0.1);
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
+        .success-box {
+            background: rgba(76, 175, 80, 0.1);
+            border-left: 4px solid #4caf50;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
+        .error-box {
+            background: rgba(244, 67, 54, 0.1);
+            border-left: 4px solid #f44336;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
+        .file-info {
+            background: rgba(255,255,255,0.05);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+
+        .file-info strong {
+            color: #667eea;
+        }
+
+        .report-list {
+            max-height: 400px;
+            overflow-y: auto;
+            margin: 20px 0;
+        }
+
+        .report-item {
+            background: rgba(255,255,255,0.05);
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .report-item:hover {
+            background: rgba(255,255,255,0.08);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .stat-card {
+            background: rgba(102, 126, 234, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+            margin: 10px 0;
+        }
+
+        .stat-label {
+            color: #aaa;
+            font-size: 0.9em;
+        }
+
+        .control-group {
+            margin: 20px 0;
+        }
+
+        .control-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #aaa;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        #status-message {
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 8px;
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📊 KEQAS 기관별 보고서 생성</h1>
+            <p>High-Sensitivity Cardiac Troponin I 외부정도관리 보고서</p>
+        </header>
+
+        <!-- Step 1: 파일 업로드 -->
+        <div class="card">
+            <h2>Step 1: 데이터 파일 업로드</h2>
+            
+            <div class="upload-section" id="upload-section">
+                <div class="upload-icon">📁</div>
+                <h3>비식별화된 CSV 파일을 선택하거나 드래그하세요</h3>
+                <p style="color: #aaa; margin: 10px 0;">파일명에 'deidentified'가 포함된 CSV 파일</p>
+                <input type="file" id="file-input" accept=".csv" multiple>
+                <button class="btn" onclick="document.getElementById('file-input').click()">
+                    파일 선택
+                </button>
+            </div>
+
+            <div id="file-info" class="file-info" style="display: none;">
+                <strong>업로드된 파일:</strong>
+                <div id="file-list"></div>
+            </div>
+        </div>
+
+        <!-- Step 2: 데이터 통계 -->
+        <div class="card" id="stats-section" style="display: none;">
+            <h2>Step 2: 데이터 통계</h2>
+            
+            <div class="stats-grid" id="stats-grid">
+                <!-- 통계가 여기에 동적으로 추가됩니다 -->
+            </div>
+
+            <div class="control-group">
+                <label for="round-select">회차 선택:</label>
+                <select id="round-select">
+                    <option value="">회차를 선택하세요</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Step 3: 보고서 생성 -->
+        <div class="card" id="generate-section" style="display: none;">
+            <h2>Step 3: 보고서 생성</h2>
+            
+            <div class="info-box">
+                <strong>ℹ️ 안내:</strong> 선택한 데이터를 기반으로 각 기관별 보고서를 생성합니다.
+            </div>
+
+            <div class="button-group">
+                <button class="btn" id="generate-all-btn" onclick="generateAllReports()">
+                    📊 전체 보고서 생성
+                </button>
+                <button class="btn btn-secondary" id="preview-btn" onclick="previewReport()">
+                    👁️ 미리보기 (첫 번째 기관)
+                </button>
+            </div>
+
+            <div class="progress-container" id="progress-container">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress-fill">0%</div>
+                </div>
+                <p id="progress-text" style="text-align: center; margin-top: 10px;"></p>
+            </div>
+
+            <div id="status-message"></div>
+        </div>
+
+        <!-- Step 4: 다운로드 -->
+        <div class="card" id="download-section" style="display: none;">
+            <h2>Step 4: 보고서 다운로드</h2>
+            
+            <div class="success-box">
+                <strong>✅ 보고서 생성 완료!</strong>
+                <p id="completion-message"></p>
+            </div>
+
+            <div class="button-group">
+                <button class="btn" onclick="downloadAllReports()">
+                    📦 모든 보고서 다운로드 (ZIP)
+                </button>
+                <button class="btn btn-secondary" onclick="downloadCommonReport()">
+                    📄 공통 보고서 다운로드
+                </button>
+            </div>
+
+            <div class="report-list" id="report-list">
+                <!-- 생성된 보고서 목록이 여기에 표시됩니다 -->
+            </div>
+        </div>
+
+        <!-- 대시보드로 돌아가기 -->
+        <div style="text-align: center; margin-top: 30px;">
+            <a href="index.html" class="btn">
+                🏠 대시보드로 돌아가기
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // 전역 변수
+        let uploadedData = null;
+        let generatedReports = [];
+        let roundInfo = null;
+
+        // 파일 업로드 처리
+        const uploadSection = document.getElementById('upload-section');
+        const fileInput = document.getElementById('file-input');
+
+        uploadSection.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        uploadSection.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadSection.classList.add('dragover');
+        });
+
+        uploadSection.addEventListener('dragleave', () => {
+            uploadSection.classList.remove('dragover');
+        });
+
+        uploadSection.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadSection.classList.remove('dragover');
+            handleFiles(e.dataTransfer.files);
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            handleFiles(e.target.files);
+        });
+
+        function handleFiles(files) {
+            if (files.length === 0) return;
+
+            const file = files[0];
+            if (!file.name.toLowerCase().endsWith('.csv')) {
+                showMessage('error', 'CSV 파일만 업로드 가능합니다.');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    parseCSV(e.target.result, file.name);
+                    document.getElementById('file-info').style.display = 'block';
+                    document.getElementById('file-list').innerHTML = `
+                        <p>📄 ${file.name}</p>
+                        <p>크기: ${(file.size / 1024).toFixed(2)} KB</p>
+                    `;
+                    showMessage('success', '파일이 성공적으로 업로드되었습니다.');
+                } catch (error) {
+                    showMessage('error', '파일 처리 중 오류가 발생했습니다: ' + error.message);
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function parseCSV(csvText, filename) {
+            // CSV 파싱
+            const lines = csvText.split('\n');
+            const headers = lines[0].split(',').map(h => h.trim());
+            
+            const data = [];
+            for (let i = 1; i < lines.length; i++) {
+                if (lines[i].trim() === '') continue;
+                
+                const values = lines[i].split(',');
+                const row = {};
+                headers.forEach((header, index) => {
+                    row[header] = values[index] ? values[index].trim() : '';
+                });
+                data.push(row);
+            }
+
+            uploadedData = {
+                headers: headers,
+                data: data,
+                filename: filename
+            };
+
+            // 회차 정보 추출
+            extractRoundInfo(filename);
+            
+            // 통계 표시
+            displayStatistics();
+            
+            // 다음 섹션 표시
+            document.getElementById('stats-section').style.display = 'block';
+            document.getElementById('generate-section').style.display = 'block';
+        }
+
+        function extractRoundInfo(filename) {
+            // 파일명에서 회차 정보 추출
+            const match = filename.match(/(\d{4})-(\d{2})/);
+            if (match) {
+                roundInfo = {
+                    year: parseInt(match[1]),
+                    round: parseInt(match[2]),
+                    label: `${match[1]}년 ${parseInt(match[2])}회차`
+                };
+                
+                const roundSelect = document.getElementById('round-select');
+                roundSelect.innerHTML = `
+                    <option value="${roundInfo.year}-${roundInfo.round}">${roundInfo.label}</option>
+                `;
+            }
+        }
+
+        function displayStatistics() {
+            if (!uploadedData) return;
+
+            const data = uploadedData.data;
+            
+            // 기관 수
+            const labs = new Set(data.map(row => row['기관명'] || row['Lab Name'] || row['기관코드']));
+            
+            // 검체별 데이터 수
+            const samples = {};
+            data.forEach(row => {
+                const sample = row['검체'] || row['Sample'] || row['검체코드'] || 'Unknown';
+                samples[sample] = (samples[sample] || 0) + 1;
+            });
+
+            // 통계 표시
+            const statsGrid = document.getElementById('stats-grid');
+            statsGrid.innerHTML = `
+                <div class="stat-card">
+                    <div class="stat-label">참여 기관 수</div>
+                    <div class="stat-value">${labs.size}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">전체 데이터 수</div>
+                    <div class="stat-value">${data.length}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">검체 종류</div>
+                    <div class="stat-value">${Object.keys(samples).length}</div>
+                </div>
+            `;
+
+            // 검체별 상세 정보
+            let samplesInfo = '<div class="info-box"><strong>검체별 데이터:</strong><ul style="margin-left: 20px; margin-top: 10px;">';
+            for (const [sample, count] of Object.entries(samples)) {
+                samplesInfo += `<li>${sample}: ${count}개</li>`;
+            }
+            samplesInfo += '</ul></div>';
+            statsGrid.innerHTML += samplesInfo;
+        }
+
+        function generateAllReports() {
+            if (!uploadedData || !roundInfo) {
+                showMessage('error', '데이터를 먼저 업로드해주세요.');
+                return;
+            }
+
+            showProgress(true);
+            generatedReports = [];
+
+            // 기관별로 데이터 그룹화
+            const labData = {};
+            uploadedData.data.forEach(row => {
+                const labName = row['기관명'] || row['Lab Name'] || row['기관코드'];
+                if (!labData[labName]) {
+                    labData[labName] = [];
+                }
+                labData[labName].push(row);
+            });
+
+            const labs = Object.keys(labData);
+            let completed = 0;
+
+            // 각 기관별 보고서 생성
+            labs.forEach((labName, index) => {
+                setTimeout(() => {
+                    const report = generateLabReport(labName, labData[labName]);
+                    generatedReports.push({
+                        labName: labName,
+                        html: report
+                    });
+
+                    completed++;
+                    const progress = Math.round((completed / labs.length) * 100);
+                    updateProgress(progress, `${completed} / ${labs.length} 보고서 생성 완료`);
+
+                    if (completed === labs.length) {
+                        showProgress(false);
+                        showDownloadSection();
+                    }
+                }, index * 100);
+            });
+        }
+
+        function generateLabReport(labName, data) {
+            // 간단한 HTML 보고서 생성
+            const samples = {};
+            const results = {};
+            
+            data.forEach(row => {
+                const sample = row['검체'] || row['Sample'] || 'Sample';
+                const result = parseFloat(row['결과'] || row['Result'] || row['측정값'] || 0);
+                
+                if (!samples[sample]) {
+                    samples[sample] = [];
+                }
+                samples[sample].push(result);
+            });
+
+            // 각 검체별 통계 계산
+            for (const [sample, values] of Object.entries(samples)) {
+                const mean = values.reduce((a, b) => a + b, 0) / values.length;
+                const sorted = [...values].sort((a, b) => a - b);
+                const median = sorted[Math.floor(sorted.length / 2)];
+                const sd = Math.sqrt(values.reduce((sq, n) => sq + Math.pow(n - mean, 2), 0) / values.length);
+                
+                results[sample] = {
+                    mean: mean.toFixed(3),
+                    median: median.toFixed(3),
+                    sd: sd.toFixed(3),
+                    count: values.length
+                };
+            }
+
+            // HTML 생성
+            let html = `
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${labName} - KEQAS 보고서</title>
+    <style>
+        body {
+            font-family: 'Malgun Gothic', sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background: #667eea;
+            color: white;
+        }
+        tr:hover {
+            background: #f5f5f5;
+        }
+        .stat-value {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #667eea;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>KEQAS 외부정도관리 보고서</h1>
+        <h2>${labName}</h2>
+        <p>${roundInfo.label} - High-Sensitivity Cardiac Troponin I</p>
+        <p>생성일: ${new Date().toLocaleDateString('ko-KR')}</p>
+    </div>
+
+    <div class="card">
+        <h2>📊 검사 결과 요약</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>검체</th>
+                    <th>측정 횟수</th>
+                    <th>평균</th>
+                    <th>중앙값</th>
+                    <th>표준편차</th>
+                </tr>
+            </thead>
+            <tbody>`;
+
+            for (const [sample, stats] of Object.entries(results)) {
+                html += `
+                <tr>
+                    <td><strong>${sample}</strong></td>
+                    <td>${stats.count}</td>
+                    <td>${stats.mean}</td>
+                    <td>${stats.median}</td>
+                    <td>${stats.sd}</td>
+                </tr>`;
+            }
+
+            html += `
+            </tbody>
+        </table>
+    </div>
+
+    <div class="card">
+        <h2>📋 상세 측정 결과</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>번호</th>
+                    <th>검체</th>
+                    <th>측정값</th>
+                </tr>
+            </thead>
+            <tbody>`;
+
+            data.forEach((row, index) => {
+                const sample = row['검체'] || row['Sample'] || 'Sample';
+                const result = row['결과'] || row['Result'] || row['측정값'] || '-';
+                html += `
+                <tr>
+                    <td>${index + 1}</td>
+                    <td>${sample}</td>
+                    <td>${result}</td>
+                </tr>`;
+            });
+
+            html += `
+            </tbody>
+        </table>
+    </div>
+
+    <div class="card">
+        <p style="color: #666; text-align: center;">
+            본 보고서는 KEQAS 외부정도관리 프로그램에 의해 자동 생성되었습니다.
+        </p>
+    </div>
+</body>
+</html>`;
+
+            return html;
+        }
+
+        function previewReport() {
+            if (!uploadedData) {
+                showMessage('error', '데이터를 먼저 업로드해주세요.');
+                return;
+            }
+
+            // 첫 번째 기관의 데이터로 미리보기 생성
+            const labData = {};
+            uploadedData.data.forEach(row => {
+                const labName = row['기관명'] || row['Lab Name'] || row['기관코드'];
+                if (!labData[labName]) {
+                    labData[labName] = [];
+                }
+                labData[labName].push(row);
+            });
+
+            const firstLab = Object.keys(labData)[0];
+            const report = generateLabReport(firstLab, labData[firstLab]);
+
+            // 새 창에서 미리보기 표시
+            const previewWindow = window.open('', '_blank');
+            previewWindow.document.write(report);
+            previewWindow.document.close();
+        }
+
+        function showDownloadSection() {
+            document.getElementById('download-section').style.display = 'block';
+            document.getElementById('completion-message').textContent = 
+                `${generatedReports.length}개 기관의 보고서가 생성되었습니다.`;
+
+            // 보고서 목록 표시
+            const reportList = document.getElementById('report-list');
+            reportList.innerHTML = '';
+            
+            generatedReports.forEach((report, index) => {
+                const item = document.createElement('div');
+                item.className = 'report-item';
+                item.innerHTML = `
+                    <span>📄 ${report.labName}</span>
+                    <button class="btn" onclick="downloadSingleReport(${index})">
+                        다운로드
+                    </button>
+                `;
+                reportList.appendChild(item);
+            });
+
+            // 스크롤
+            document.getElementById('download-section').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function downloadSingleReport(index) {
+            const report = generatedReports[index];
+            const blob = new Blob([report.html], { type: 'text/html' });
+            const filename = `Report_${report.labName}_${roundInfo.year}_${roundInfo.round}.html`;
+            saveAs(blob, filename);
+        }
+
+        function downloadAllReports() {
+            const zip = new JSZip();
+            const folder = zip.folder(`reports_${roundInfo.year}_${roundInfo.round}`);
+
+            generatedReports.forEach(report => {
+                const filename = `Report_${report.labName}.html`;
+                folder.file(filename, report.html);
+            });
+
+            zip.generateAsync({ type: 'blob' }).then(content => {
+                saveAs(content, `KEQAS_Reports_${roundInfo.year}_${roundInfo.round}.zip`);
+            });
+        }
+
+        function downloadCommonReport() {
+            // 공통 보고서 생성 (모든 기관의 통계)
+            showMessage('info', '공통 보고서 기능은 추후 구현 예정입니다.');
+        }
+
+        function showProgress(show) {
+            document.getElementById('progress-container').style.display = show ? 'block' : 'none';
+            if (!show) {
+                updateProgress(0, '');
+            }
+        }
+
+        function updateProgress(percentage, text) {
+            const fill = document.getElementById('progress-fill');
+            fill.style.width = percentage + '%';
+            fill.textContent = percentage + '%';
+            document.getElementById('progress-text').textContent = text;
+        }
+
+        function showMessage(type, message) {
+            const statusDiv = document.getElementById('status-message');
+            statusDiv.className = type === 'error' ? 'error-box' : 
+                                 type === 'success' ? 'success-box' : 'info-box';
+            statusDiv.textContent = message;
+            statusDiv.style.display = 'block';
+            
+            setTimeout(() => {
+                statusDiv.style.display = 'none';
+            }, 5000);
+        }
+    </script>
+</body>
+</html>
