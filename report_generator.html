@@ -597,42 +597,27 @@
             });
         }
 
-        function generateLabReport(labCode, data) {
-            // 간단한 HTML 보고서 생성
-            const samples = {};
-            const results = {};
+        function generateLabReport(labCode, labData) {
+            // 파이썬 버전과 동일한 수준의 상세한 HTML 보고서 생성
             
             // 기기 정보 추출
-            const firstRow = data[0] || {};
-            const deviceCompany = firstRow['기기회사명'] || '-';
-            const deviceName = firstRow['기기명'] || '-';
+            const firstRow = labData[0] || {};
+            const deviceCompany = firstRow['기기회사명'] || firstRow['기기회사'] || '-';
+            const deviceName = firstRow['기기명'] || firstRow['기기'] || '-';
+            const reagentCompany = firstRow['시약회사명'] || firstRow['시약회사'] || '-';
+            const refClass = firstRow['기준분류'] || '-';
             
-            data.forEach(row => {
-                const sample = row['검체명'] || row['검체'] || row['Sample'] || 'Sample';
-                const result = parseFloat(row['검사결과'] || row['결과'] || row['Result'] || row['측정값'] || 0);
-                
-                if (!samples[sample]) {
-                    samples[sample] = [];
-                }
-                if (!isNaN(result)) {
-                    samples[sample].push(result);
+            // 검체명 추출 및 정렬
+            const specimens = [...new Set(labData.map(row => row['검체명'] || row['검체']))].sort();
+            
+            // 검체별 데이터 정리
+            const specimenData = {};
+            labData.forEach(row => {
+                const specimen = row['검체명'] || row['검체'];
+                if (!specimenData[specimen]) {
+                    specimenData[specimen] = row;
                 }
             });
-
-            // 각 검체별 통계 계산
-            for (const [sample, values] of Object.entries(samples)) {
-                const mean = values.reduce((a, b) => a + b, 0) / values.length;
-                const sorted = [...values].sort((a, b) => a - b);
-                const median = sorted[Math.floor(sorted.length / 2)];
-                const sd = Math.sqrt(values.reduce((sq, n) => sq + Math.pow(n - mean, 2), 0) / values.length);
-                
-                results[sample] = {
-                    mean: mean.toFixed(3),
-                    median: median.toFixed(3),
-                    sd: sd.toFixed(3),
-                    count: values.length
-                };
-            }
 
             // HTML 생성
             let html = `
@@ -642,12 +627,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>${labCode} - KEQAS 보고서</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <style>
         body {
-            font-family: 'Malgun Gothic', sans-serif;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
+            font-family: 'Malgun Gothic', 'Malgun Gothic', sans-serif;
+            margin: 20px;
             background: #f5f5f5;
         }
         .header {
@@ -656,35 +640,75 @@
             padding: 30px;
             border-radius: 10px;
             text-align: center;
-            margin-bottom: 30px;
-        }
-        .card {
-            background: white;
-            border-radius: 10px;
-            padding: 20px;
             margin-bottom: 20px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .info-section {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
         table {
-            width: 100%;
             border-collapse: collapse;
+            width: 100%;
+            background: white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
         }
         th, td {
-            padding: 12px;
+            border: 1px solid #ccc;
+            padding: 8px;
             text-align: left;
-            border-bottom: 1px solid #ddd;
         }
         th {
-            background: #667eea;
+            background-color: #333;
             color: white;
+            font-weight: bold;
         }
         tr:hover {
-            background: #f5f5f5;
+            background-color: #f5f5f5;
         }
-        .stat-value {
-            font-size: 1.5em;
+        .chart-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .charts-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+        #toggle-enlarge {
+            padding: 8px 16px;
+            border: 1px solid #667eea;
+            background: #667eea;
+            color: white;
+            cursor: pointer;
+            border-radius: 5px;
             font-weight: bold;
-            color: #667eea;
+        }
+        #toggle-enlarge:hover {
+            background: #764ba2;
+        }
+        .grid-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 15px 0;
+        }
+        .grid-item {
+            flex: 1 1 32%;
+            max-width: 34%;
+            text-align: center;
+        }
+        #charts-wrapper.enlarge .grid-item {
+            flex: 1 1 48%;
+            max-width: 48%;
         }
     </style>
 </head>
@@ -693,81 +717,196 @@
         <h1>KEQAS 외부정도관리 보고서</h1>
         <h2>${labCode}</h2>
         <p>${roundInfo.label} - High-Sensitivity Cardiac Troponin I</p>
-        <p>기기: ${deviceCompany} ${deviceName}</p>
         <p>생성일: ${new Date().toLocaleDateString('ko-KR')}</p>
     </div>
 
-    <div class="card">
-        <h2>📊 검사 결과 요약</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>검체</th>
-                    <th>측정 횟수</th>
-                    <th>평균</th>
-                    <th>중앙값</th>
-                    <th>표준편차</th>
-                </tr>
-            </thead>
-            <tbody>`;
-
-            for (const [sample, stats] of Object.entries(results)) {
-                html += `
-                <tr>
-                    <td><strong>${sample}</strong></td>
-                    <td>${stats.count}</td>
-                    <td>${stats.mean}</td>
-                    <td>${stats.median}</td>
-                    <td>${stats.sd}</td>
-                </tr>`;
-            }
-
-            html += `
-            </tbody>
-        </table>
+    <div class="info-section">
+        <strong>기기회사:</strong> ${deviceCompany} &nbsp;&nbsp;
+        <strong>기기명:</strong> ${deviceName} <br>
+        <strong>시약회사:</strong> ${reagentCompany} &nbsp;&nbsp;
+        <strong>기준분류:</strong> ${refClass}
     </div>
 
-    <div class="card">
-        <h2>📋 상세 측정 결과</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>번호</th>
-                    <th>검체</th>
-                    <th>측정값</th>
-                </tr>
-            </thead>
-            <tbody>`;
+    <h3>검사 결과 요약</h3>
+    <table>
+        <tr>
+            <th>Specimen</th>
+            <th>Your Result</th>
+            <th>Group</th>
+            <th>N</th>
+            <th>Mean</th>
+            <th>SD</th>
+            <th>CV(%)</th>
+            <th>Median</th>
+            <th>Min</th>
+            <th>Max</th>
+            <th>SDI</th>
+            <th>Remark</th>
+        </tr>`;
 
-            data.forEach((row, index) => {
-                const sample = row['검체명'] || row['검체'] || row['Sample'] || 'Sample';
-                const result = row['검사결과'] || row['결과'] || row['Result'] || row['측정값'] || '-';
+            // 검체별 통계 테이블 생성
+            specimens.forEach(specimen => {
+                const data = specimenData[specimen];
+                if (!data) return;
+                
+                const yourResult = data['검사결과'] || '-';
+                
+                // All 그룹
                 html += `
-                <tr>
-                    <td>${index + 1}</td>
-                    <td>${sample}</td>
-                    <td>${result}</td>
-                </tr>`;
+        <tr>
+            <td rowspan="3">${specimen}</td>
+            <td rowspan="3">${yourResult}</td>
+            <td>All</td>
+            <td>${data['ALL_기관수'] || '-'}</td>
+            <td>${data['ALL_평균값'] || '-'}</td>
+            <td>${data['ALL_표준편차'] || '-'}</td>
+            <td>${data['ALL_변동계수'] || '-'}</td>
+            <td>${data['ALL_중간값'] || '-'}</td>
+            <td>${data['ALL_최소값'] || '-'}</td>
+            <td>${data['ALL_최대값'] || '-'}</td>
+            <td>-</td>
+            <td>${data['ALL_Outlier'] || 'NO'}</td>
+        </tr>`;
+                
+                // 기준분류 그룹
+                html += `
+        <tr>
+            <td>${data['기준분류'] || '-'}</td>
+            <td>${data['기준분류_기관수'] || '-'}</td>
+            <td>${data['기준분류_평균값'] || '-'}</td>
+            <td>${data['기준분류_표준편차'] || '-'}</td>
+            <td>${data['기준분류_변동계수'] || '-'}</td>
+            <td>${data['기준분류_중간값'] || '-'}</td>
+            <td>${data['기준분류_최소값'] || '-'}</td>
+            <td>${data['기준분류_최대값'] || '-'}</td>
+            <td>${data['기준분류_sdi (Number)'] || '-'}</td>
+            <td>${data['기준분류_Outlier'] || 'NO'}</td>
+        </tr>`;
+                
+                // 세분류 그룹
+                html += `
+        <tr>
+            <td>${data['세분류'] || '-'}</td>
+            <td>${data['세분류_기관수'] || '-'}</td>
+            <td>${data['세분류_평균값'] || '-'}</td>
+            <td>${data['세분류_표준편차'] || '-'}</td>
+            <td>${data['세분류_변동계수'] || '-'}</td>
+            <td>${data['세분류_중간값'] || '-'}</td>
+            <td>${data['세분류_최소값'] || '-'}</td>
+            <td>${data['세분류_최대값'] || '-'}</td>
+            <td>${data['세분류_sdi (Number)'] || '-'}</td>
+            <td>${data['세분류_Outlier'] || 'NO'}</td>
+        </tr>`;
             });
 
             html += `
-            </tbody>
-        </table>
+    </table>
+
+    <div class="charts-header">
+        <h3 style="margin:0;">그래프</h3>
+        <button id="toggle-enlarge" type="button">크게 보기</button>
+    </div>
+    <div id="charts-wrapper">`;
+
+            // Levey-Jennings Chart
+            html += `
+        <div class="chart-container">
+            <h4>Levey-Jennings Chart (SDI: 기준분류)</h4>
+            <div id="levey-jennings"></div>
+        </div>`;
+
+            // Youden Plots
+            if (specimens.length >= 3) {
+                html += `
+        <div class="chart-container">
+            <h4>Youden Plot</h4>
+            <div class="grid-row">
+                <div class="grid-item">
+                    <h5>${specimens[0]} vs ${specimens[1]}</h5>
+                    <div id="youden-12"></div>
+                </div>
+                <div class="grid-item">
+                    <h5>${specimens[1]} vs ${specimens[2]}</h5>
+                    <div id="youden-23"></div>
+                </div>
+                <div class="grid-item">
+                    <h5>${specimens[0]} vs ${specimens[2]}</h5>
+                    <div id="youden-13"></div>
+                </div>
+            </div>
+        </div>`;
+            }
+
+            // Histograms
+            html += `
+        <div class="chart-container">
+            <h4>기준분류별 분포 히스토그램</h4>
+            <div class="grid-row">`;
+            
+            specimens.forEach(specimen => {
+                html += `
+                <div class="grid-item">
+                    <h5>${specimen}</h5>
+                    <div id="hist-${specimen.replace(/[^a-zA-Z0-9]/g, '')}"></div>
+                </div>`;
+            });
+
+            html += `
+            </div>
+        </div>
     </div>
 
-    <div class="card">
-        <p style="color: #666; text-align: center;">
-            본 보고서는 KEQAS 외부정도관리 프로그램에 의해 자동 생성되었습니다.
-        </p>
-    </div>
-</body>
-</html>`;
+    <script>
+        // Levey-Jennings Chart 생성
+        (function() {
+            const specimens = ${JSON.stringify(specimens)};
+            const sdiValues = ${JSON.stringify(specimens.map(s => {
+                const data = specimenData[s];
+                return parseFloat(data['기준분류_sdi (Number)']) || 0;
+            }))};
 
-            return html;
+            const trace = {
+                x: specimens,
+                y: sdiValues,
+                mode: 'lines+markers+text',
+                marker: { size: 10, color: 'black' },
+                line: { color: 'black', width: 2 },
+                text: sdiValues.map(v => v.toFixed(2)),
+                textposition: 'top center',
+                name: 'SDI 값'
+            };
+
+            const shapes = [
+                { type: 'line', x0: -0.5, x1: specimens.length - 0.5, y0: 0, y1: 0, line: { color: 'green', width: 2 } },
+                { type: 'line', x0: -0.5, x1: specimens.length - 0.5, y0: 1, y1: 1, line: { color: 'yellow', width: 1.5, dash: 'dash' } },
+                { type: 'line', x0: -0.5, x1: specimens.length - 0.5, y0: -1, y1: -1, line: { color: 'yellow', width: 1.5, dash: 'dash' } },
+                { type: 'line', x0: -0.5, x1: specimens.length - 0.5, y0: 2, y1: 2, line: { color: 'orange', width: 1.5, dash: 'dash' } },
+                { type: 'line', x0: -0.5, x1: specimens.length - 0.5, y0: -2, y1: -2, line: { color: 'orange', width: 1.5, dash: 'dash' } },
+                { type: 'line', x0: -0.5, x1: specimens.length - 0.5, y0: 3, y1: 3, line: { color: 'red', width: 1.5, dash: 'dash' } },
+                { type: 'line', x0: -0.5, x1: specimens.length - 0.5, y0: -3, y1: -3, line: { color: 'red', width: 1.5, dash: 'dash' } }
+            ];
+
+            const layout = {
+                yaxis: { title: 'SDI', range: [-4, 4], zeroline: true },
+                xaxis: { title: '검체명' },
+                shapes: shapes,
+                showlegend: false,
+                height: 400
+            };
+
+            Plotly.newPlot('levey-jennings', [trace], layout);
+        })();
+
+        // 크게 보기 토글
+        const toggleBtn = document.getElementById('toggle-enlarge');
+        const chartsWrapper = document.getElementById('charts-wrapper');
+        if (toggleBtn && chartsWrapper) {
+            toggleBtn.addEventListener('click', () => {
+                chartsWrapper.classList.toggle('enlarge');
+                toggleBtn.textContent = chartsWrapper.classList.contains('enlarge') ? '원래 크기' : '크게 보기';
+            });
         }
-
-        function previewReport() {
-            if (!uploadedData) {
+    </script>
                 showMessage('error', '데이터를 먼저 업로드해주세요.');
                 return;
             }
