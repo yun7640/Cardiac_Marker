@@ -637,10 +637,40 @@
         .header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 30px;
+            padding: 40px 30px;
             border-radius: 10px;
             text-align: center;
             margin-bottom: 20px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+        .header h1 {
+            margin: 0 0 10px 0;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .header h2 {
+            margin: 15px 0 10px 0;
+            font-size: 32px;
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+        .header .subtitle {
+            font-size: 18px;
+            margin: 10px 0;
+            opacity: 0.95;
+        }
+        .header .round-info {
+            background: rgba(255,255,255,0.2);
+            display: inline-block;
+            padding: 8px 20px;
+            border-radius: 20px;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+        .header .date-info {
+            font-size: 14px;
+            margin-top: 15px;
+            opacity: 0.9;
         }
         .info-section {
             background: white;
@@ -714,10 +744,11 @@
 </head>
 <body>
     <div class="header">
-        <h1>KEQAS 외부정도관리 보고서</h1>
+        <h1>🏥 KEQAS 외부정도관리 보고서</h1>
+        <div class="round-info">${roundInfo.label}</div>
         <h2>${labCode}</h2>
-        <p>${roundInfo.label} - High-Sensitivity Cardiac Troponin I</p>
-        <p>생성일: ${new Date().toLocaleDateString('ko-KR')}</p>
+        <div class="subtitle">High-Sensitivity Cardiac Troponin I (hs-TnI)</div>
+        <div class="date-info">📅 보고서 생성일: ${new Date().toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' })}</div>
     </div>
 
     <div class="info-section">
