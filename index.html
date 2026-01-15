@@ -588,8 +588,12 @@
         function showLogin() {
             document.getElementById('loginPage').style.display = 'block';
             document.getElementById('dashboardPage').classList.remove('active');
-            document.getElementById('username').value = '';
-            document.getElementById('password').value = '';
+            // 저장된 로그인 정보가 없을 때만 초기화
+            const rememberMe = localStorage.getItem('keqas_remember_me') === 'true';
+            if (!rememberMe) {
+                document.getElementById('username').value = '';
+                document.getElementById('password').value = '';
+            }
         }
         
         // 대시보드 페이지 표시
