@@ -363,6 +363,138 @@
             font-size: 14px;
         }
         
+        /* 모달 스타일 */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            animation: fadeIn 0.3s ease-out;
+        }
+        
+        .modal-content {
+            background-color: white;
+            margin: 10% auto;
+            padding: 30px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            animation: slideDown 0.3s ease-out;
+        }
+        
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #667eea;
+        }
+        
+        .modal-header h2 {
+            margin: 0;
+            color: #667eea;
+            font-size: 24px;
+        }
+        
+        .close-btn {
+            font-size: 28px;
+            font-weight: bold;
+            color: #999;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 0;
+            line-height: 1;
+        }
+        
+        .close-btn:hover {
+            color: #333;
+        }
+        
+        .modal-body {
+            color: #333;
+            line-height: 1.8;
+        }
+        
+        .modal-body h3 {
+            color: #667eea;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+        
+        .modal-body code {
+            background: #f5f5f5;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 13px;
+        }
+        
+        .modal-body .command-box {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 14px;
+            overflow-x: auto;
+        }
+        
+        .modal-footer {
+            margin-top: 25px;
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+        
+        .modal-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .modal-btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .modal-btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+        
+        .modal-btn-secondary {
+            background: #e5e7eb;
+            color: #333;
+        }
+        
+        .modal-btn-secondary:hover {
+            background: #d1d5db;
+        }
+        
         @media (max-width: 768px) {
             .container {
                 padding: 30px 20px;
@@ -477,11 +609,11 @@
             </div>
             
             <!-- 보고서 생성기 -->
-            <div class="dashboard-card" onclick="location.href='report_generator.html'">
+            <div class="dashboard-card" onclick="openReportGenerator()">
                 <span class="badge">도구</span>
                 <h3>⚙️ 보고서 생성기</h3>
                 <p>새 보고서 생성<br>데이터 처리 도구</p>
-                <a href="report_generator.html" class="btn">생성기 열기</a>
+                <a href="#" onclick="event.preventDefault(); openReportGenerator();" class="btn">생성기 열기</a>
             </div>
         </div>
         
@@ -498,6 +630,39 @@
         <div class="footer">
             <p>KEQAS (Korean External Quality Assessment Service) | 대한임상검사정도관리협회</p>
             <p style="margin-top: 8px;">© 2025 All rights reserved.</p>
+        </div>
+    </div>
+    
+    <!-- 보고서 생성기 모달 -->
+    <div id="reportGeneratorModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>⚙️ 보고서 생성기 실행</h2>
+                <button class="close-btn" onclick="closeReportGenerator()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p><strong>💡 보고서 생성기는 로컬 웹 서버로 실행됩니다.</strong></p>
+                
+                <h3>🚀 실행 방법</h3>
+                
+                <p><strong>1방법: PowerShell에서 직접 실행</strong></p>
+                <div class="command-box">cd "G:\내 드라이브\00_KEQAS\Troponin_I"<br>.venv\Scripts\Activate.ps1<br>streamlit run "분석용코드/generate_report_web.py"</div>
+                
+                <p><strong>2방법: 배치 파일 실행</strong></p>
+                <p><code>start_report_generator.bat</code> 파일을 더블클릭하세요</p>
+                
+                <h3>✅ 실행 후</h3>
+                <p>서버가 시작되면 자동으로 브라우저가 열립니다.</p>
+                <p>또는 수동으로 <strong>http://localhost:8501</strong>로 접속하세요.</p>
+                
+                <div style="background: #fff3cd; padding: 12px; border-radius: 6px; margin-top: 15px; border-left: 4px solid #ffc107;">
+                    <strong>⚠️ 주의:</strong> 서버가 이미 실행 중이면 비밀번호 입력 후 바로 접속하세요.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn modal-btn-secondary" onclick="closeReportGenerator()">취소</button>
+                <button class="modal-btn modal-btn-primary" onclick="openStreamlitServer()">서버 접속</button>
+            </div>
         </div>
     </div>
     
@@ -609,6 +774,30 @@
         
         // 페이지 로드 시 로그인 상태 확인
         window.addEventListener('load', checkLoginStatus);
+        
+        // 보고서 생성기 모달 열기
+        function openReportGenerator() {
+            document.getElementById('reportGeneratorModal').style.display = 'block';
+        }
+        
+        // 보고서 생성기 모달 닫기
+        function closeReportGenerator() {
+            document.getElementById('reportGeneratorModal').style.display = 'none';
+        }
+        
+        // Streamlit 서버 접속
+        function openStreamlitServer() {
+            window.open('http://localhost:8501', '_blank');
+            closeReportGenerator();
+        }
+        
+        // 모달 외부 클릭 시 닫기
+        window.onclick = function(event) {
+            const modal = document.getElementById('reportGeneratorModal');
+            if (event.target === modal) {
+                closeReportGenerator();
+            }
+        }
         
         // 카드 클릭 애니메이션
         document.querySelectorAll('.dashboard-card').forEach(card => {
