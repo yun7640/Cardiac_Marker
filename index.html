@@ -432,7 +432,7 @@
     </div>
     
     <!-- 대시보드 페이지 -->
-    <div class="container" id="dashboardPage" style="display: none !important;">
+    <div class="container" id="dashboardPage">
         <div class="header">
             <button class="logout-btn" onclick="logout()">로그아웃</button>
             <h1>🏥 KEQAS 외부정도관리</h1>
@@ -583,8 +583,12 @@
         
         // 로그인 페이지 표시
         function showLogin() {
-            document.getElementById('loginPage').classList.remove('hidden');
-            document.getElementById('dashboardPage').classList.remove('active');
+            const loginPage = document.getElementById('loginPage');
+            const dashboardPage = document.getElementById('dashboardPage');
+            loginPage.style.display = 'block';
+            loginPage.classList.remove('hidden');
+            dashboardPage.style.display = 'none';
+            dashboardPage.classList.remove('active');
             // 저장된 로그인 정보가 없을 때만 초기화
             const rememberMe = localStorage.getItem('keqas_remember_me') === 'true';
             if (!rememberMe) {
@@ -595,8 +599,12 @@
         
         // 대시보드 페이지 표시
         function showDashboard() {
-            document.getElementById('loginPage').classList.add('hidden');
-            document.getElementById('dashboardPage').classList.add('active');
+            const loginPage = document.getElementById('loginPage');
+            const dashboardPage = document.getElementById('dashboardPage');
+            loginPage.style.display = 'none';
+            loginPage.classList.add('hidden');
+            dashboardPage.style.display = 'block';
+            dashboardPage.classList.add('active');
         }
         
         // 페이지 로드 시 로그인 상태 확인
