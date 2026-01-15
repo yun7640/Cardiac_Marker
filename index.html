@@ -21,6 +21,127 @@
             justify-content: center;
         }
         
+        /* 로그인 페이지 스타일 */
+        .login-container {
+            max-width: 450px;
+            width: 100%;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 50px 40px;
+            animation: fadeIn 0.6s ease-out;
+        }
+        
+        .login-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .login-header h1 {
+            font-size: 28px;
+            color: #333;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        
+        .login-header p {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .login-form {
+            margin-bottom: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: all 0.3s ease;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .login-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+        }
+        
+        .error-message {
+            color: #ef4444;
+            font-size: 13px;
+            margin-top: 10px;
+            text-align: center;
+            display: none;
+        }
+        
+        .remember-me {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .remember-me input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            margin-right: 8px;
+            cursor: pointer;
+        }
+        
+        .remember-me label {
+            color: #666;
+            font-size: 14px;
+            cursor: pointer;
+            user-select: none;
+        }
+        
+        .login-info {
+            margin-top: 25px;
+            padding: 15px;
+            background: #f0f9ff;
+            border-radius: 8px;
+            border-left: 4px solid #0284c7;
+        }
+        
+        .login-info p {
+            color: #0369a1;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+        
+        /* 대시보드 페이지 스타일 */
         .container {
             max-width: 1200px;
             width: 100%;
@@ -29,6 +150,11 @@
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
             padding: 50px;
             animation: fadeIn 0.6s ease-out;
+            display: none;
+        }
+        
+        .container.active {
+            display: block;
         }
         
         @keyframes fadeIn {
@@ -47,6 +173,27 @@
             margin-bottom: 50px;
             padding-bottom: 30px;
             border-bottom: 3px solid #667eea;
+            position: relative;
+        }
+        
+        .logout-btn {
+            position: absolute;
+            top: 0;
+            right: 0;
+            padding: 8px 20px;
+            background: #ef4444;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .logout-btn:hover {
+            background: #dc2626;
+            transform: translateY(-1px);
         }
         
         .header h1 {
@@ -216,6 +363,10 @@
                 padding: 30px 20px;
             }
             
+            .login-container {
+                padding: 30px 25px;
+            }
+            
             .header h1 {
                 font-size: 28px;
             }
@@ -227,12 +378,58 @@
             .dashboard-grid {
                 grid-template-columns: 1fr;
             }
+            
+            .logout-btn {
+                position: static;
+                display: block;
+                width: 100%;
+                margin-bottom: 20px;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
+    <!-- 로그인 페이지 -->
+    <div class="login-container" id="loginPage">
+        <div class="login-header">
+            <h1>🏥 KEQAS</h1>
+            <p>심장표지자단백검사 (hs-TnI)</p>
+        </div>
+        
+        <form class="login-form" id="loginForm">
+            <div class="form-group">
+                <label for="username">사용자명</label>
+                <input type="text" id="username" name="username" required autocomplete="username">
+            </div>
+            
+            <div class="form-group">
+                <label for="password">비밀번호</label>
+                <input type="password" id="password" name="password" required autocomplete="current-password">
+            </div>
+            
+            <div class="remember-me">
+                <input type="checkbox" id="rememberMe" name="rememberMe">
+                <label for="rememberMe">로그인 정보 기억하기</label>
+            </div>
+            
+            <button type="submit" class="login-btn">로그인</button>
+            
+            <div class="error-message" id="errorMessage">
+                사용자명 또는 비밀번호가 올바르지 않습니다.
+            </div>
+        </form>
+        
+        <div class="login-info">
+            <p><strong>💡 안내:</strong></p>
+            <p>KEQAS 외부정도관리 시스템에 접근하려면 로그인이 필요합니다.</p>
+            <p style="margin-top: 8px;">문의: KEQAS 관리자</p>
+        </div>
+    </div>
+    
+    <!-- 대시보드 페이지 -->
+    <div class="container" id="dashboardPage">
         <div class="header">
+            <button class="logout-btn" onclick="logout()">로그아웃</button>
             <h1>🏥 KEQAS 외부정도관리</h1>
             <h2>심장표지자단백검사 (hs-TnI)</h2>
             <p>High-Sensitivity Cardiac Troponin I 검사 결과 대시보드</p>
@@ -308,6 +505,102 @@
     </div>
     
     <script>
+        // 페이지 로드 시 저장된 로그인 정보 불러오기
+        function loadSavedCredentials() {
+            const savedUsername = localStorage.getItem('keqas_saved_username');
+            const savedPassword = localStorage.getItem('keqas_saved_password');
+            const rememberMe = localStorage.getItem('keqas_remember_me') === 'true';
+            
+            if (rememberMe && savedUsername && savedPassword) {
+                document.getElementById('username').value = savedUsername;
+                document.getElementById('password').value = savedPassword;
+                document.getElementById('rememberMe').checked = true;
+            }
+        }
+        
+        // 로그인 상태 확인
+        function checkLoginStatus() {
+            const isLoggedIn = sessionStorage.getItem('keqas_logged_in');
+            if (isLoggedIn === 'true') {
+                showDashboard();
+            } else {
+                showLogin();
+                loadSavedCredentials();
+            }
+        }
+        
+        // 로그인 처리
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const rememberMe = document.getElementById('rememberMe').checked;
+            
+            // 임시 로그인 인증 (실제 환경에서는 서버 인증 필요)
+            // 여러 계정 허용
+            const validCredentials = [
+                { username: 'keqas', password: 'keqas2025!' },
+                { username: 'admin', password: 'admin2025' },
+                { username: 'user', password: 'user2025' }
+            ];
+            
+            const isValid = validCredentials.some(cred => 
+                cred.username === username && cred.password === password
+            );
+            
+            if (isValid) {
+                // 로그인 정보 기억하기 처리
+                if (rememberMe) {
+                    localStorage.setItem('keqas_saved_username', username);
+                    localStorage.setItem('keqas_saved_password', password);
+                    localStorage.setItem('keqas_remember_me', 'true');
+                } else {
+                    localStorage.removeItem('keqas_saved_username');
+                    localStorage.removeItem('keqas_saved_password');
+                    localStorage.removeItem('keqas_remember_me');
+                }
+                
+                sessionStorage.setItem('keqas_logged_in', 'true');
+                sessionStorage.setItem('keqas_username', username);
+                showDashboard();
+                document.getElementById('errorMessage').style.display = 'none';
+            } else {
+                document.getElementById('errorMessage').style.display = 'block';
+            }
+        });
+        
+        // 로그아웃 처리
+        function logout() {
+            // 로그인 정보 기억하기가 체크되어 있지 않으면 저장된 정보도 삭제
+            const rememberMe = localStorage.getItem('keqas_remember_me') === 'true';
+            if (!rememberMe) {
+                localStorage.removeItem('keqas_saved_username');
+                localStorage.removeItem('keqas_saved_password');
+            }
+            sessionStorage.removeItem('keqas_logged_in');
+            sessionStorage.removeItem('keqas_username');
+            showLogin();
+            loadSavedCredentials();
+        }
+        
+        // 로그인 페이지 표시
+        function showLogin() {
+            document.getElementById('loginPage').style.display = 'block';
+            document.getElementById('dashboardPage').classList.remove('active');
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+        }
+        
+        // 대시보드 페이지 표시
+        function showDashboard() {
+            document.getElementById('loginPage').style.display = 'none';
+            document.getElementById('dashboardPage').classList.add('active');
+        }
+        
+        // 페이지 로드 시 로그인 상태 확인
+        window.addEventListener('load', checkLoginStatus);
+        
         // 카드 클릭 애니메이션
         document.querySelectorAll('.dashboard-card').forEach(card => {
             card.addEventListener('click', function(e) {
