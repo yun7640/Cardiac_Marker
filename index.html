@@ -2,14 +2,328 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="refresh" content="0; url=KEQAS_hs_TnI_Dashboard.html">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KEQAS hs-TnI 보고서</title>
+    <title>KEQAS hs-TnI 심장표지자단백검사 대시보드</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Malgun Gothic', '맑은 고딕', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .container {
+            max-width: 1200px;
+            width: 100%;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 50px;
+            animation: fadeIn 0.6s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+            padding-bottom: 30px;
+            border-bottom: 3px solid #667eea;
+        }
+        
+        .header h1 {
+            font-size: 38px;
+            color: #333;
+            margin-bottom: 15px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+        
+        .header h2 {
+            font-size: 24px;
+            color: #667eea;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+        
+        .header p {
+            color: #666;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+        
+        .update-badge {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 10px 25px;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+        }
+        
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+        
+        .dashboard-card {
+            background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .dashboard-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transition: height 0.3s ease;
+        }
+        
+        .dashboard-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.3);
+            border-color: #667eea;
+        }
+        
+        .dashboard-card:hover::before {
+            height: 100%;
+            opacity: 0.05;
+        }
+        
+        .dashboard-card h3 {
+            font-size: 22px;
+            color: #333;
+            margin-bottom: 12px;
+            font-weight: 700;
+        }
+        
+        .dashboard-card p {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+        
+        .dashboard-card .btn {
+            display: inline-block;
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        .dashboard-card .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            background: #667eea;
+            color: white;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .badge.new {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.7;
+            }
+        }
+        
+        .info-section {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            border-left: 4px solid #0284c7;
+            padding: 20px 25px;
+            border-radius: 8px;
+            margin-top: 30px;
+        }
+        
+        .info-section h4 {
+            color: #0c4a6e;
+            font-size: 16px;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        
+        .info-section ul {
+            list-style-position: inside;
+            color: #0369a1;
+            font-size: 14px;
+            line-height: 1.8;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 2px solid #e5e7eb;
+            color: #9ca3af;
+            font-size: 14px;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 30px 20px;
+            }
+            
+            .header h1 {
+                font-size: 28px;
+            }
+            
+            .header h2 {
+                font-size: 20px;
+            }
+            
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
 <body>
-    <p>대시보드로 이동 중...</p>
+    <div class="container">
+        <div class="header">
+            <h1>🏥 KEQAS 외부정도관리</h1>
+            <h2>심장표지자단백검사 (hs-TnI)</h2>
+            <p>High-Sensitivity Cardiac Troponin I 검사 결과 대시보드</p>
+            <div class="update-badge">
+                ✓ 최신 업데이트: 2025년 2회차
+            </div>
+        </div>
+        
+        <div class="dashboard-grid">
+            <!-- 2025년 2회차 Web 대시보드 -->
+            <div class="dashboard-card" onclick="location.href='KEQAS_hs_TnI_Dashboard_Web_2025_2.html'">
+                <span class="badge new">최신</span>
+                <h3>📊 2025년 2회차 Web 대시보드</h3>
+                <p>기관별 보고서 검색 및 조회<br>실시간 필터링 기능</p>
+                <a href="KEQAS_hs_TnI_Dashboard_Web_2025_2.html" class="btn">대시보드 열기</a>
+            </div>
+            
+            <!-- 2025년 2회차 기본 대시보드 -->
+            <div class="dashboard-card" onclick="location.href='KEQAS_hs_TnI_Dashboard_2025_2.html'">
+                <span class="badge">2회차</span>
+                <h3>📈 2025년 2회차 대시보드</h3>
+                <p>기관별 보고서 목록<br>빠른 접근</p>
+                <a href="KEQAS_hs_TnI_Dashboard_2025_2.html" class="btn">대시보드 열기</a>
+            </div>
+            
+            <!-- 2025년 1회차 대시보드 -->
+            <div class="dashboard-card" onclick="location.href='KEQAS_hs_TnI_Dashboard_2025_1.html'">
+                <span class="badge">1회차</span>
+                <h3>📋 2025년 1회차 대시보드</h3>
+                <p>기관별 보고서 목록<br>이전 회차 조회</p>
+                <a href="KEQAS_hs_TnI_Dashboard_2025_1.html" class="btn">대시보드 열기</a>
+            </div>
+            
+            <!-- 통합 보고서 -->
+            <div class="dashboard-card" onclick="location.href='KEQAS_hs_TnI_Common_Report.html'">
+                <span class="badge">통합</span>
+                <h3>📑 통합 보고서</h3>
+                <p>전체 기관 통계<br>종합 분석 리포트</p>
+                <a href="KEQAS_hs_TnI_Common_Report.html" class="btn">보고서 열기</a>
+            </div>
+            
+            <!-- SDI 이상치 분석 -->
+            <div class="dashboard-card" onclick="location.href='KEQAS_hs_TnI_SDI_Outlier_Analysis.html'">
+                <span class="badge">분석</span>
+                <h3>🔍 SDI 이상치 분석</h3>
+                <p>이상치 탐지 및 분석<br>품질관리 리포트</p>
+                <a href="KEQAS_hs_TnI_SDI_Outlier_Analysis.html" class="btn">분석 열기</a>
+            </div>
+            
+            <!-- 보고서 생성기 -->
+            <div class="dashboard-card" onclick="location.href='report_generator.html'">
+                <span class="badge">도구</span>
+                <h3>⚙️ 보고서 생성기</h3>
+                <p>새 보고서 생성<br>데이터 처리 도구</p>
+                <a href="report_generator.html" class="btn">생성기 열기</a>
+            </div>
+        </div>
+        
+        <div class="info-section">
+            <h4>📌 사용 안내</h4>
+            <ul>
+                <li>각 회차별 대시보드에서 기관별 상세 보고서를 확인할 수 있습니다</li>
+                <li>Web 대시보드는 검색 및 필터링 기능을 제공합니다</li>
+                <li>통합 보고서에서 전체 기관의 통계를 확인할 수 있습니다</li>
+                <li>SDI 이상치 분석으로 품질관리 상태를 모니터링할 수 있습니다</li>
+            </ul>
+        </div>
+        
+        <div class="footer">
+            <p>KEQAS (Korean External Quality Assessment Service) | 대한임상검사정도관리협회</p>
+            <p style="margin-top: 8px;">© 2025 All rights reserved.</p>
+        </div>
+    </div>
+    
     <script>
-        window.location.href = "KEQAS_hs_TnI_Dashboard.html";
+        // 카드 클릭 애니메이션
+        document.querySelectorAll('.dashboard-card').forEach(card => {
+            card.addEventListener('click', function(e) {
+                // 버튼 클릭 시 중복 방지
+                if (e.target.tagName !== 'A') {
+                    const link = this.querySelector('a');
+                    if (link) {
+                        window.location.href = link.href;
+                    }
+                }
+            });
+        });
+        
+        // 페이지 로드 시 사용 가능한 파일 확인 (선택사항)
+        console.log('KEQAS hs-TnI Dashboard v2.0');
+        console.log('Available dashboards loaded successfully');
     </script>
 </body>
 </html>
