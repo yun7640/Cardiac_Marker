@@ -641,22 +641,48 @@
                 <button class="close-btn" onclick="closeReportGenerator()">&times;</button>
             </div>
             <div class="modal-body">
-                <p><strong>💡 보고서 생성기는 로컬 웹 서버로 실행됩니다.</strong></p>
+                <div style="background: #e3f2fd; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #2196f3;">
+                    <strong>💡 보고서 생성기는 로컬 웹 서버로 실행됩니다.</strong>
+                </div>
                 
-                <h3>🚀 실행 방법</h3>
+                <h3 style="color: #2196f3; margin-top: 20px;">🚀 빠른 시작</h3>
                 
-                <p><strong>1방법: PowerShell에서 직접 실행</strong></p>
-                <div class="command-box">cd "G:\내 드라이브\00_KEQAS\Troponin_I"<br>.venv\Scripts\Activate.ps1<br>streamlit run "분석용코드/generate_report_web.py"</div>
+                <div style="background: #f5f5f5; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                    <p style="margin: 0 0 10px 0;"><strong>1단계: 아래 파일을 더블클릭하여 서버 시작</strong></p>
+                    <div style="background: white; padding: 15px; border-radius: 6px; border: 2px solid #2196f3; margin-bottom: 10px;">
+                        <div style="text-align: center; margin-bottom: 10px;">
+                            <span style="font-size: 32px;">📄</span>
+                            <div style="font-size: 16px; font-weight: bold; color: #2196f3; margin-top: 8px;">start_report_generator.bat</div>
+                        </div>
+                        <button onclick="openBatchFileLocation()" style="width: 100%; padding: 12px; background: #2196f3; color: white; border: none; border-radius: 6px; font-size: 14px; font-weight: bold; cursor: pointer;">
+                            📂 파일 위치 복사하기
+                        </button>
+                    </div>
+                    <p style="margin: 0; font-size: 12px; color: #666; text-align: center;">파일 위치: G:\내 드라이브\00_KEQAS\Troponin_I\</p>
+                </div>
                 
-                <p><strong>2방법: 배치 파일 실행</strong></p>
-                <p><code>start_report_generator.bat</code> 파일을 더블클릭하세요</p>
+                <div style="background: #e8f5e9; padding: 15px; border-radius: 8px; border-left: 4px solid #4caf50; margin-bottom: 15px;">
+                    <p style="margin: 0 0 10px 0;"><strong>2단계: 서버 시작 후 접속</strong></p>
+                    <p style="margin: 0 0 8px 0; font-size: 14px;">✓ 배치 파일 실행 시 브라우저가 자동으로 열립니다</p>
+                    <p style="margin: 0; font-size: 14px;">✓ 또는 아래 "서버 접속" 버튼을 클릭하세요</p>
+                </div>
                 
-                <h3>✅ 실행 후</h3>
-                <p>서버가 시작되면 자동으로 브라우저가 열립니다.</p>
-                <p>또는 수동으로 <strong>http://localhost:8501</strong>로 접속하세요.</p>
+                <details style="margin: 20px 0;">
+                    <summary style="cursor: pointer; font-weight: bold; padding: 10px; background: #f0f0f0; border-radius: 6px;">📋 수동 실행 방법 (PowerShell)</summary>
+                    <div style="margin-top: 10px; padding: 10px; background: #fafafa; border-radius: 6px;">
+                        <div class="command-box" style="margin-top: 10px;">cd "G:\내 드라이브\00_KEQAS\Troponin_I"<br>.venv\Scripts\Activate.ps1<br>streamlit run "분석용코드/generate_report_web.py"</div>
+                    </div>
+                </details>
+                
+                <h3 style="color: #4caf50; margin-top: 20px;">✅ 서버 시작 후</h3>
+                <div style="background: #e8f5e9; padding: 15px; border-radius: 8px; border-left: 4px solid #4caf50;">
+                    <p style="margin: 0 0 8px 0;">✓ 브라우저가 자동으로 열립니다</p>
+                    <p style="margin: 0 0 8px 0;">✓ 또는 아래 버튼으로 수동 접속하세요</p>
+                    <p style="margin: 0; font-size: 14px; color: #666;">주소: <strong>http://localhost:8501</strong></p>
+                </div>
                 
                 <div style="background: #fff3cd; padding: 12px; border-radius: 6px; margin-top: 15px; border-left: 4px solid #ffc107;">
-                    <strong>⚠️ 주의:</strong> 서버가 이미 실행 중이면 비밀번호 입력 후 바로 접속하세요.
+                    <strong>⚠️ 주의:</strong> 서버가 이미 실행 중이면 바로 "서버 접속" 버튼을 클릭하세요.
                 </div>
             </div>
             <div class="modal-footer">
@@ -787,8 +813,40 @@
         
         // Streamlit 서버 접속
         function openStreamlitServer() {
-            window.open('http://localhost:8501', '_blank');
+            // 먼저 서버 접속 시도
+            const serverWindow = window.open('http://localhost:8501', '_blank');
+            
+            // 3초 후에도 서버에 접속하지 못하면 안내 메시지 표시
+            setTimeout(() => {
+                if (!serverWindow || serverWindow.closed || typeof serverWindow.closed === 'undefined') {
+                    alert('⚠️ 서버에 접속할 수 없습니다.\n\n다음 파일을 실행하세요:\nG:\\내 드라이브\\00_KEQAS\\Troponin_I\\start_report_generator.bat\n\n파일 탐색기에서 위 경로를 열어 배치 파일을 더블클릭하세요.');
+                }
+            }, 3000);
+            
             closeReportGenerator();
+        }
+        
+        // 배치 파일 위치 열기
+        function openBatchFileLocation() {
+            // Windows 파일 탐색기를 열 수 없으므로 경로를 클립보드에 복사
+            const path = 'G:\\내 드라이브\\00_KEQAS\\Troponin_I';
+            
+            // 임시 텍스트 영역 생성
+            const textarea = document.createElement('textarea');
+            textarea.value = path;
+            textarea.style.position = 'fixed';
+            textarea.style.opacity = '0';
+            document.body.appendChild(textarea);
+            textarea.select();
+            
+            try {
+                document.execCommand('copy');
+                alert('✅ 파일 경로가 클립보드에 복사되었습니다!\n\n경로: ' + path + '\n\n파일 탐색기 주소창에 붙여넣기(Ctrl+V) 후 Enter를 누르세요.');
+            } catch (err) {
+                alert('파일 위치:\n' + path + '\n\n파일 탐색기에서 이 경로를 열어 start_report_generator.bat 파일을 더블클릭하세요.');
+            }
+            
+            document.body.removeChild(textarea);
         }
         
         // 모달 외부 클릭 시 닫기
